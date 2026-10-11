@@ -1,0 +1,134 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-amber: var(--amber);
+  --color-amber-deep: var(--amber-deep);
+  --color-ok: var(--ok);
+  --color-err: var(--err);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+}
+
+:root {
+  --radius: 0.75rem;
+  /* Palette: #A2DDA9 (Luminous Mint / Celadon) & Obsidian Pine Contrast */
+  --background: #0b140e;
+  --foreground: #f3f8f4;
+  --surface: #111e15;
+  --surface-2: #182a1e;
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --amber: #a2dda9;
+  --amber-deep: #7ecb87;
+  --ok: #a2dda9;
+  --err: #f87171;
+  --ink: #09180e;
+  --paper: #f3f8f4;
+  --primary: #a2dda9;
+  --primary-foreground: #09180e;
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--surface);
+  --muted-foreground: #90a596;
+  --accent: #a2dda9;
+  --accent-foreground: #09180e;
+  --destructive: var(--err);
+  --destructive-foreground: #ffffff;
+  --border: #243b2c;
+  --input: #243b2c;
+  --ring: #a2dda9;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    font-family: var(--font-sans);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+  :focus-visible {
+    outline: 3px solid var(--amber);
+    outline-offset: 2px;
+  }
+  :lang(hi),
+  :lang(mr) {
+    line-height: 1.5;
+    letter-spacing: 0 !important;
+  }
+}
+
+@utility token-digits {
+  font-size: clamp(6rem, 38vw, 16rem);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "zero", "tnum";
+  line-height: 1;
+}
+@utility fare-readout {
+  font-size: clamp(3rem, 16vw, 6rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+@utility plate {
+  border: 2px solid var(--foreground);
+  border-radius: 6px;
+  padding: 0.15rem 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #070e17 !important;
+  }
+  .print-sticker {
+    width: 148mm !important;
+    height: 105mm !important;
+    border: 2px solid #070e17 !important;
+    page-break-inside: avoid;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    box-shadow: none !important;
+  }
+}
