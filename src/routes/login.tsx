@@ -95,6 +95,29 @@ function LoginPage() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    const result = await signInWithGoogle(activeRole);
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      if (
+        result.error?.includes("provider is not enabled") ||
+        result.error?.includes("validation_failed") ||
+        result.error?.includes("Unsupported provider")
+      ) {
+        const msg =
+          "Google sign-in is not enabled in your Supabase project yet. Please enable Google under Supabase Dashboard > Authentication > Providers.";
+        setErrorMessage(msg);
+        toast.error(msg, { duration: 6000 });
+      } else {
+        setErrorMessage(result.error ?? "Failed to sign in with Google.");
+        toast.error(result.error ?? "Failed to sign in with Google.");
+      }
+    }
+  };
+
   const handleQuickFill = (testEmail: string, testPass: string, roleType: "proxy" | "driver") => {
     setEmail(testEmail);
     setPassword(testPass);
@@ -239,7 +262,7 @@ function LoginPage() {
         <button
           id="btn-google-login"
           type="button"
-          onClick={() => signInWithGoogle(activeRole)}
+          onClick={handleGoogleSignIn}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background py-2.5 text-xs font-bold text-foreground hover:bg-surface-2 transition-all shadow-sm"
         >
           <svg className="size-4" viewBox="0 0 24 24">

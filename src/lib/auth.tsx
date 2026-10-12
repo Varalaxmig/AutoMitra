@@ -228,17 +228,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ? `${window.location.origin}/login${roleHint ? `?role=${roleHint}` : ""}`
         : undefined;
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo,
-      },
-    });
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo,
+        },
+      });
 
-    if (error) {
-      return { success: false, error: error.message };
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err?.message ?? "OAuth initialization failed." };
     }
-    return { success: true };
   };
 
   const signOut = async (): Promise<void> => {
