@@ -19,6 +19,8 @@ import { confirm, reject, useStore, type Session } from "@/lib/store";
 import { useLang, type Key } from "@/lib/i18n";
 import { soundbox } from "@/lib/audio";
 
+import { ProtectedRoute } from "@/lib/auth";
+
 export const Route = createFileRoute("/console")({
   head: () => ({
     meta: [
@@ -35,8 +37,16 @@ export const Route = createFileRoute("/console")({
       },
     ],
   }),
-  component: Console,
+  component: ConsolePage,
 });
+
+function ConsolePage() {
+  return (
+    <ProtectedRoute requiredRole="proxy">
+      <Console />
+    </ProtectedRoute>
+  );
+}
 
 type Filter = "awaiting" | "confirmed" | "failed";
 
@@ -216,9 +226,12 @@ function Console() {
         <ul className="mt-4 space-y-3">
           {filteredSessions.length === 0 && (
             <li className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
-              {searchToken
-                ? `No sessions found matching AM token "${searchToken}"`
-                : t("emptySessions")}
+              <div className="font-bold text-foreground text-sm mb-1">Nothing here yet</div>
+              <div className="text-xs">
+                {searchToken
+                  ? `No sessions found matching AM token "${searchToken}"`
+                  : t("emptySessions")}
+              </div>
             </li>
           )}
           {filteredSessions.map((s) => {

@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConsoleRouteImport } from './routes/console'
+import { Route as DriverRouteImport } from './routes/driver'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as OnboardRouteImport } from './routes/onboard'
 import { Route as QSlugRouteImport } from './routes/q.$slug'
 
@@ -22,6 +24,16 @@ const IndexRoute = IndexRouteImport.update({
 const ConsoleRoute = ConsoleRouteImport.update({
   id: '/console',
   path: '/console',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverRoute = DriverRouteImport.update({
+  id: '/driver',
+  path: '/driver',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardRoute = OnboardRouteImport.update({
@@ -38,12 +50,16 @@ const QSlugRoute = QSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRoute
+  '/driver': typeof DriverRoute
+  '/login': typeof LoginRoute
   '/onboard': typeof OnboardRoute
   '/q/$slug': typeof QSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/console': typeof ConsoleRoute
+  '/driver': typeof DriverRoute
+  '/login': typeof LoginRoute
   '/onboard': typeof OnboardRoute
   '/q/$slug': typeof QSlugRoute
 }
@@ -51,20 +67,31 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/console': typeof ConsoleRoute
+  '/driver': typeof DriverRoute
+  '/login': typeof LoginRoute
   '/onboard': typeof OnboardRoute
   '/q/$slug': typeof QSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/console' | '/onboard' | '/q/$slug'
+  fullPaths: '/' | '/console' | '/driver' | '/login' | '/onboard' | '/q/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/console' | '/onboard' | '/q/$slug'
-  id: '__root__' | '/' | '/console' | '/onboard' | '/q/$slug'
+  to: '/' | '/console' | '/driver' | '/login' | '/onboard' | '/q/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/console'
+    | '/driver'
+    | '/login'
+    | '/onboard'
+    | '/q/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConsoleRoute: typeof ConsoleRoute
+  DriverRoute: typeof DriverRoute
+  LoginRoute: typeof LoginRoute
   OnboardRoute: typeof OnboardRoute
   QSlugRoute: typeof QSlugRoute
 }
@@ -83,6 +110,20 @@ declare module '@tanstack/react-router' {
       path: '/console'
       fullPath: '/console'
       preLoaderRoute: typeof ConsoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver': {
+      id: '/driver'
+      path: '/driver'
+      fullPath: '/driver'
+      preLoaderRoute: typeof DriverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboard': {
@@ -105,6 +146,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsoleRoute: ConsoleRoute,
+  DriverRoute: DriverRoute,
+  LoginRoute: LoginRoute,
   OnboardRoute: OnboardRoute,
   QSlugRoute: QSlugRoute,
 }
