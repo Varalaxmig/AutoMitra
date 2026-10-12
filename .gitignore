@@ -18,6 +18,7 @@ dist-ssr
 *.local
 .env
 .env.*
+.env.test
 !.env.example
 
 # Wrangler / Cloudflare

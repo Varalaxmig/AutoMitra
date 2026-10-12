@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "seed:test": "cross-env ALLOW_TEST_SEED=true tsx scripts/seed-test-users.ts",
+    "cleanup:test": "cross-env ALLOW_TEST_SEED=true tsx scripts/cleanup-test-users.ts"
   },
   "overrides": {
     "rolldown": "1.2.1"
@@ -82,6 +84,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.2.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.6",
@@ -90,6 +93,7 @@
     "globals": "^15.15.0",
     "jsdom": "^20.0.3",
     "prettier": "^3.7.3",
+    "tsx": "^4.23.15",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5",
