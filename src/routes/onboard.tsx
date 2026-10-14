@@ -17,10 +17,13 @@ import {
   ArrowRight,
   ArrowLeft,
   Download,
+  Lock,
+  LogIn,
 } from "lucide-react";
 import { toast } from "sonner";
 import { addDriver, rotateQr, sendOtp, useStore, vpaCount, type Lang } from "@/lib/store";
 import { useLang } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth";
 import { downloadA6StickerPdf } from "@/lib/sticker-pdf";
 
 export const Route = createFileRoute("/onboard")({
@@ -42,10 +45,56 @@ const field =
   "h-13 w-full rounded-xl border-2 border-border bg-surface px-4 text-base outline-none focus:border-amber text-foreground transition-colors";
 
 function Onboard() {
+  const { user, isLoading } = useAuth();
   const { lang, t, tn } = useLang();
   const allDrivers = useStore((s) => s.drivers);
   const drivers = allDrivers.filter((d) => d.active);
   const [activeTab, setActiveTab] = useState<"fleet" | "register">("fleet");
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-4 border-amber border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="mx-auto flex min-h-[75vh] max-w-lg flex-col items-center justify-center px-4 py-12 text-center">
+        <div className="mx-auto flex size-20 items-center justify-center rounded-3xl bg-amber/15 text-amber shadow-sm mb-6 border border-amber/20">
+          <Lock className="size-10" />
+        </div>
+        <h1 className="text-3xl font-black text-foreground tracking-tight">
+          Sign In Required
+        </h1>
+        <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-md">
+          Driver onboarding and dashboard QR sticker generation is restricted to authorized family proxies and administrators. Please sign in to register an auto, bind 2G keypad phones, and generate stickers.
+        </p>
+
+        <div className="mt-8 flex w-full flex-col sm:flex-row items-center justify-center gap-3">
+          <Link
+            to="/login"
+            search={{ redirectTo: "/onboard" }}
+            id="btn-onboard-signin"
+            className="flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-amber px-6 font-bold text-ink shadow-md hover:bg-amber-deep transition-all active:scale-[0.99]"
+          >
+            <LogIn className="size-5" />
+            <span>Sign In to Continue</span>
+          </Link>
+
+          <Link
+            to="/"
+            id="btn-onboard-back-home"
+            className="flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-border bg-surface px-5 font-semibold text-muted-foreground hover:text-foreground transition-all"
+          >
+            <ArrowLeft className="size-4" />
+            <span>Back to Home</span>
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   const [f, setF] = useState({
     firstName: "",

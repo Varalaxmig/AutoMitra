@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ShieldCheck, CarTaxiFront, LogIn, AlertCircle, Sparkles } from "lucide-react";
+import { ShieldCheck, LogIn, AlertCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { useAuth, type UserRole } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { useLang } from "@/lib/i18n";
 
 type LoginSearch = {
@@ -12,9 +12,8 @@ type LoginSearch = {
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>): LoginSearch => {
-    const role = (search.role as string) === "driver" ? "driver" : "proxy";
     return {
-      role,
+      role: search.role as "proxy" | "driver" | undefined,
       redirectTo: search.redirectTo as string | undefined,
     };
   },
@@ -23,7 +22,7 @@ export const Route = createFileRoute("/login")({
       { title: "Sign In — AutoMitra" },
       {
         name: "description",
-        content: "Secure login for Family Proxies and Auto-Rickshaw Drivers.",
+        content: "Secure login for AutoMitra accounts.",
       },
     ],
   }),
@@ -31,23 +30,15 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const { role: searchRole, redirectTo } = Route.useSearch();
+  const { redirectTo } = Route.useSearch();
   const navigate = useNavigate();
   const { signIn, signInWithGoogle, user, role: userRole } = useAuth();
   const { lang, t } = useLang();
 
-  const [activeRole, setActiveRole] = useState<"proxy" | "driver">(searchRole ?? "proxy");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  // Sync active role if search param changes
-  useEffect(() => {
-    if (searchRole) {
-      setActiveRole(searchRole);
-    }
-  }, [searchRole]);
 
   // If already logged in, redirect to respective destination
   useEffect(() => {
@@ -87,7 +78,7 @@ function LoginPage() {
       toast.success("Signed in successfully!");
       if (redirectTo) {
         navigate({ to: redirectTo as any });
-      } else if (activeRole === "driver") {
+      } else if (result.role === "driver") {
         navigate({ to: "/driver" });
       } else {
         navigate({ to: "/console" });
@@ -98,7 +89,7 @@ function LoginPage() {
   const handleGoogleSignIn = async () => {
     setIsSubmitting(true);
     setErrorMessage(null);
-    const result = await signInWithGoogle(activeRole);
+    const result = await signInWithGoogle("proxy");
     setIsSubmitting(false);
 
     if (!result.success) {
@@ -118,10 +109,9 @@ function LoginPage() {
     }
   };
 
-  const handleQuickFill = (testEmail: string, testPass: string, roleType: "proxy" | "driver") => {
+  const handleQuickFill = (testEmail: string, testPass: string) => {
     setEmail(testEmail);
     setPassword(testPass);
-    setActiveRole(roleType);
     setErrorMessage(null);
   };
 
@@ -130,59 +120,14 @@ function LoginPage() {
       {/* Header */}
       <div className="text-center">
         <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-amber/15 text-amber shadow-sm mb-4">
-          {activeRole === "driver" ? (
-            <CarTaxiFront className="size-7" />
-          ) : (
-            <ShieldCheck className="size-7" />
-          )}
+          <ShieldCheck className="size-7" />
         </div>
         <h1 className="text-2xl md:text-3xl font-black text-foreground">
-          {activeRole === "driver" ? "Driver Sign In" : "Family Proxy Sign In"}
+          Sign In
         </h1>
         <p className="mt-2 text-xs md:text-sm text-muted-foreground">
-          {activeRole === "driver"
-            ? "Access your rides, fare ledger, and 2G SMS delivery history"
-            : "Verify bank credits and confirm passenger fares in real time"}
+          Sign in to AutoMitra to onboard drivers, verify rides, and manage fares
         </p>
-      </div>
-
-      {/* Role Selector Tabs */}
-      <div className="mt-6 flex rounded-xl border border-border bg-surface p-1 shadow-sm">
-        <button
-          type="button"
-          id="tab-role-proxy"
-          onClick={() => {
-            setActiveRole("proxy");
-            setErrorMessage(null);
-            navigate({ search: { role: "proxy", redirectTo } });
-          }}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-black transition-all ${
-            activeRole === "proxy"
-              ? "bg-amber text-ink shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <ShieldCheck className="size-4" />
-          <span>Family Proxy</span>
-        </button>
-
-        <button
-          type="button"
-          id="tab-role-driver"
-          onClick={() => {
-            setActiveRole("driver");
-            setErrorMessage(null);
-            navigate({ search: { role: "driver", redirectTo } });
-          }}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-black transition-all ${
-            activeRole === "driver"
-              ? "bg-amber text-ink shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <CarTaxiFront className="size-4" />
-          <span>Auto Driver</span>
-        </button>
       </div>
 
       {/* Login Card */}
@@ -211,7 +156,7 @@ function LoginPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={activeRole === "driver" ? "driver1@automitra.test" : "proxy1@automitra.test"}
+              placeholder="name@example.com"
               required
               className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/20"
             />
@@ -297,40 +242,40 @@ function LoginPage() {
           <button
             type="button"
             id="btn-quick-proxy1"
-            onClick={() => handleQuickFill("proxy1@automitra.test", "ProxyOne#2026-Test", "proxy")}
+            onClick={() => handleQuickFill("proxy1@automitra.test", "ProxyOne#2026-Test")}
             className="flex flex-col items-start rounded-xl border border-border bg-surface p-2.5 text-left text-xs hover:border-amber/60 hover:bg-amber/5 transition-all"
           >
-            <span className="font-bold text-foreground">Sneha Test (Proxy)</span>
+            <span className="font-bold text-foreground">Sneha Test</span>
             <span className="text-[10px] text-muted-foreground font-mono">proxy1 (EN)</span>
           </button>
 
           <button
             type="button"
             id="btn-quick-proxy2"
-            onClick={() => handleQuickFill("proxy2@automitra.test", "ProxyTwo#2026-Test", "proxy")}
+            onClick={() => handleQuickFill("proxy2@automitra.test", "ProxyTwo#2026-Test")}
             className="flex flex-col items-start rounded-xl border border-border bg-surface p-2.5 text-left text-xs hover:border-amber/60 hover:bg-amber/5 transition-all"
           >
-            <span className="font-bold text-foreground">Meera Test (Proxy)</span>
+            <span className="font-bold text-foreground">Meera Test</span>
             <span className="text-[10px] text-muted-foreground font-mono">proxy2 (MR मराठी)</span>
           </button>
 
           <button
             type="button"
             id="btn-quick-driver1"
-            onClick={() => handleQuickFill("driver1@automitra.test", "DriverOne#2026-Test", "driver")}
+            onClick={() => handleQuickFill("driver1@automitra.test", "DriverOne#2026-Test")}
             className="flex flex-col items-start rounded-xl border border-border bg-surface p-2.5 text-left text-xs hover:border-amber/60 hover:bg-amber/5 transition-all"
           >
-            <span className="font-bold text-foreground">Ramesh Test (Driver)</span>
+            <span className="font-bold text-foreground">Ramesh Test</span>
             <span className="text-[10px] text-muted-foreground font-mono">driver1 (HI हिन्दी)</span>
           </button>
 
           <button
             type="button"
             id="btn-quick-driver2"
-            onClick={() => handleQuickFill("driver2@automitra.test", "DriverTwo#2026-Test", "driver")}
+            onClick={() => handleQuickFill("driver2@automitra.test", "DriverTwo#2026-Test")}
             className="flex flex-col items-start rounded-xl border border-border bg-surface p-2.5 text-left text-xs hover:border-amber/60 hover:bg-amber/5 transition-all"
           >
-            <span className="font-bold text-foreground">Suresh Test (Driver)</span>
+            <span className="font-bold text-foreground">Suresh Test</span>
             <span className="text-[10px] text-muted-foreground font-mono">driver2 (MR मराठी)</span>
           </button>
         </div>

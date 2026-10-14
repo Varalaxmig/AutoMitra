@@ -144,7 +144,6 @@ export function Navbar() {
           ) : (
             <Link
               to="/login"
-              search={{ role: "proxy" }}
               id="nav-btn-login"
               className="flex items-center gap-1.5 rounded-lg bg-amber px-3 py-1.5 text-xs font-black text-ink shadow-sm hover:bg-amber/90 transition-all ml-1 shrink-0"
             >
