@@ -43,34 +43,34 @@
 
 :root {
   --radius: 0.75rem;
-  /* Palette: #A2DDA9 (Luminous Mint / Celadon) & Obsidian Pine Contrast */
-  --background: #0b140e;
-  --foreground: #f3f8f4;
-  --surface: #111e15;
-  --surface-2: #182a1e;
-  --card: var(--surface);
-  --card-foreground: var(--foreground);
-  --popover: var(--surface);
-  --popover-foreground: var(--foreground);
-  --amber: #a2dda9;
-  --amber-deep: #7ecb87;
-  --ok: #a2dda9;
+  /* Deep Navy Blue Gradient Theme with White Body Text & White Navbar */
+  --background: #020b18;
+  --foreground: #ffffff;
+  --surface: rgba(8, 26, 56, 0.75);
+  --surface-2: #0c2954;
+  --card: rgba(8, 26, 56, 0.75);
+  --card-foreground: #ffffff;
+  --popover: #081d3e;
+  --popover-foreground: #ffffff;
+  --amber: #38bdf8;
+  --amber-deep: #0284c7;
+  --ok: #4ade80;
   --err: #f87171;
-  --ink: #09180e;
-  --paper: #f3f8f4;
-  --primary: #a2dda9;
-  --primary-foreground: #09180e;
-  --secondary: var(--surface-2);
-  --secondary-foreground: var(--foreground);
-  --muted: var(--surface);
-  --muted-foreground: #90a596;
-  --accent: #a2dda9;
-  --accent-foreground: #09180e;
-  --destructive: var(--err);
+  --ink: #020b18;
+  --paper: #ffffff;
+  --primary: #38bdf8;
+  --primary-foreground: #020b18;
+  --secondary: #0c2954;
+  --secondary-foreground: #ffffff;
+  --muted: rgba(8, 26, 56, 0.75);
+  --muted-foreground: #cbd5e1;
+  --accent: #38bdf8;
+  --accent-foreground: #020b18;
+  --destructive: #f87171;
   --destructive-foreground: #ffffff;
-  --border: #243b2c;
-  --input: #243b2c;
-  --ring: #a2dda9;
+  --border: rgba(255, 255, 255, 0.16);
+  --input: rgba(255, 255, 255, 0.16);
+  --ring: #38bdf8;
 }
 
 @layer base {
@@ -81,8 +81,10 @@
     font-family: var(--font-sans);
   }
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    background: linear-gradient(145deg, #020b18 0%, #061938 35%, #0a254e 70%, #0e3266 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #ffffff;
   }
   :focus-visible {
     outline: 3px solid var(--amber);
@@ -93,6 +95,13 @@
     line-height: 1.5;
     letter-spacing: 0 !important;
   }
+}
+
+.nav-gradient-text {
+  background: linear-gradient(180deg, #020b1e 0%, #08214d 45%, #1d4ed8 85%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 @utility token-digits {
