@@ -5,6 +5,7 @@ export interface SmsPayload {
   toPhone: string;
   kind: SmsKind;
   senderName: string;
+  senderUpi?: string;
   amount: number | string;
   sessionId?: string;
   otpCode?: string;
@@ -14,7 +15,7 @@ export interface SmsPayload {
 export interface SmsSendResult {
   success: boolean;
   messageId?: string;
-  provider: 'fast2sms' | 'twilio' | 'mock';
+  provider: 'telegram' | 'twilio' | 'mock' | 'fast2sms' | 'textbee';
   error?: string;
   deliveryStatus: 'queued' | 'sent' | 'failed';
 }

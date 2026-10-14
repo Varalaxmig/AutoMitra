@@ -13,7 +13,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "seed:test": "cross-env ALLOW_TEST_SEED=true tsx scripts/seed-test-users.ts",
-    "cleanup:test": "cross-env ALLOW_TEST_SEED=true tsx scripts/cleanup-test-users.ts"
+    "cleanup:test": "cross-env ALLOW_TEST_SEED=true tsx scripts/cleanup-test-users.ts",
+    "test:telegram": "tsx scripts/test-telegram-dispatch.ts",
+    "test:textbee": "tsx scripts/test-textbee-dispatch.ts",
+    "supabase:ping": "tsx scripts/keep-supabase-alive.ts",
+    "supabase:auto": "tsx scripts/keep-supabase-alive.ts --loop --interval=24"
   },
   "overrides": {
     "rolldown": "1.2.1"

@@ -1,13 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   buildSmsBody,
-  sendFast2Sms,
+  sendMockSms,
   isTwilioFallbackAllowed,
   recordSmsFailure,
   recordSmsSuccess,
   isCircuitOpen,
   resetCircuitBreaker,
-  parseFast2SmsDlr,
 } from '@/lib/sms';
 
 describe('SMS Module & Gateway Engine (Phase 4)', () => {
@@ -24,7 +23,7 @@ describe('SMS Module & Gateway Engine (Phase 4)', () => {
         amount: 85,
         lang: 'en',
       });
-      expect(body).toBe("Sender's name: Aditi Roy\nAmount: Rs.85\nStatus: Pending");
+      expect(body).toBe("From AutoMitra\nUPI ID: Aditi Roy\nAmount: Rs.85\nTransaction Status: Pending");
     });
 
     it('formats confirm SMS in Hindi', () => {
@@ -35,7 +34,7 @@ describe('SMS Module & Gateway Engine (Phase 4)', () => {
         amount: 85,
         lang: 'hi',
       });
-      expect(body).toBe("Sender's name: Aditi Roy\nAmount: Rs.85\nStatus: सफल (Success)");
+      expect(body).toBe("From AutoMitra\nUPI ID: Aditi Roy\nAmount: Rs.85\nTransaction Status: सफल (Successful)");
     });
 
     it('formats void SMS in Marathi', () => {
@@ -46,7 +45,7 @@ describe('SMS Module & Gateway Engine (Phase 4)', () => {
         amount: 85,
         lang: 'mr',
       });
-      expect(body).toBe("Sender's name: Aditi Roy\nAmount: Rs.85\nStatus: अयशस्वी (Failed)");
+      expect(body).toBe("From AutoMitra\nUPI ID: Aditi Roy\nAmount: Rs.85\nTransaction Status: अयशस्वी (Failed)");
     });
 
     it('formats OTP challenge message', () => {
@@ -94,9 +93,9 @@ describe('SMS Module & Gateway Engine (Phase 4)', () => {
     });
   });
 
-  describe('Fast2SMS Dispatch & DLR Parsing (TASK-17 / TASK-18)', () => {
-    it('dispatches mock SMS when no API key is provided', async () => {
-      const res = await sendFast2Sms({
+  describe('Mock SMS Dispatch (TASK-17)', () => {
+    it('dispatches mock SMS with sent status', async () => {
+      const res = await sendMockSms({
         toPhone: '9820012345',
         kind: 'claim',
         senderName: 'Test Commuter',
@@ -106,16 +105,6 @@ describe('SMS Module & Gateway Engine (Phase 4)', () => {
       expect(res.provider).toBe('mock');
       expect(res.deliveryStatus).toBe('sent');
       expect(res.messageId).toBeDefined();
-    });
-
-    it('parses Fast2SMS delivery receipt webhook payload correctly', () => {
-      const report = parseFast2SmsDlr({
-        request_id: 'req_98765',
-        status: 'DELIVERED',
-        delivered_at: '2026-10-11T20:00:00Z',
-      });
-      expect(report.messageId).toBe('req_98765');
-      expect(report.status).toBe('DELIVERED');
     });
   });
 });

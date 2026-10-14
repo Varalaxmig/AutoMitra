@@ -15,9 +15,10 @@ import {
   Search,
 } from "lucide-react";
 import { toast } from "sonner";
-import { confirm, reject, useStore, type Session } from "@/lib/store";
+import { confirm, reject, useStore, recordEscalatedSms, type Session } from "@/lib/store";
 import { useLang, type Key } from "@/lib/i18n";
 import { soundbox } from "@/lib/audio";
+import { checkSessionEscalation } from "@/lib/sms/escalation";
 
 import { ProtectedRoute } from "@/lib/auth";
 
@@ -63,9 +64,41 @@ function Console() {
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    const i = setInterval(() => setNow(Date.now()), 1000);
+    const i = setInterval(() => {
+      setNow(Date.now());
+
+      // Evaluate escalation triggers for all claimed sessions
+      const claimed = sessions.filter((s) => s.status === "claimed");
+      for (const s of claimed) {
+        const d = drivers.find((x) => x.slug === s.slug);
+        checkSessionEscalation(
+          s,
+          d,
+          (pinged) => {
+            soundbox.playReminderPing();
+            toast.warning(
+              `Reminder: Fare of ₹${pinged.amount} from ${pinged.senderName} waiting 20s!`,
+              { icon: "⏰" }
+            );
+          },
+          (escalated) => {
+            if (d?.proxyPhone) {
+              recordEscalatedSms(
+                d.proxyPhone,
+                `${escalated.senderName} (URGENT 2m Rem)`,
+                escalated.amount
+              );
+              toast.error(
+                `🚨 Escalated to backup proxy (${d.proxyPhone}): ₹${escalated.amount} unconfirmed after 2m!`,
+                { duration: 8000 }
+              );
+            }
+          }
+        );
+      }
+    }, 1000);
     return () => clearInterval(i);
-  }, []);
+  }, [sessions, drivers]);
 
   const activeDrivers = drivers.filter((d) => d.active);
 
@@ -238,12 +271,21 @@ function Console() {
             const d = drivers.find((x) => x.slug === s.slug);
             const secs = Math.floor((now - (s.claimedAt ?? s.createdAt)) / 1000);
             const isEditing = editingSessionId === s.id;
+            const isClaimed = s.status === "claimed";
+            const isT20 = isClaimed && secs >= 20 && secs < 120;
+            const isT120 = isClaimed && secs >= 120;
 
             return (
               <li
                 key={s.id}
                 id={`session-${s.id}`}
-                className="rounded-xl border border-border bg-surface p-4 shadow-sm"
+                className={`rounded-xl border p-4 shadow-sm transition-all ${
+                  isT120
+                    ? "border-err/80 bg-surface ring-2 ring-err/50"
+                    : isT20
+                      ? "border-amber bg-surface ring-2 ring-amber/50 animate-pulse"
+                      : "border-border bg-surface"
+                }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1">
@@ -259,6 +301,18 @@ function Console() {
                         <Hash className="size-3" />
                         AM{s.token}
                       </span>
+                      {isT120 && (
+                        <span className="inline-flex items-center gap-1 font-bold text-[11px] bg-err/15 text-err px-2 py-0.5 rounded border border-err/30">
+                          <AlertTriangle className="size-3" />
+                          URGENT (2m+ backup alerted)
+                        </span>
+                      )}
+                      {isT20 && (
+                        <span className="inline-flex items-center gap-1 font-bold text-[11px] bg-amber/20 text-amber-deep dark:text-amber px-2 py-0.5 rounded border border-amber/40">
+                          <Clock className="size-3" />
+                          Waiting 20s+
+                        </span>
+                      )}
                     </div>
 
                     {/* Amount */}

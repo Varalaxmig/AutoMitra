@@ -156,11 +156,11 @@ function Commuter() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const n = Number(fare);
-    if (!/^\d+(\.\d)?$/.test(fare) || n < 10 || n > 5000) {
+    if (!/^\d+(\.\d{1,2})?$/.test(fare) || n < 1 || n > 5000) {
       setErr(true);
       return;
     }
-    const s = initiate(slug, n, senderName);
+    const s = initiate(slug, n, senderName, senderName);
     setSid(s.id);
     if (typeof window !== "undefined") {
       sessionStorage.setItem(`am_session_${slug}`, s.id);

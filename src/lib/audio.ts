@@ -88,6 +88,40 @@ class Soundbox {
       // Audio playback failed or blocked by browser policy
     }
   }
+
+  // T = 20s subtle reminder ping (soft double high ping)
+  playReminderPing() {
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const notes = [
+        { freq: 880, start: 0, dur: 0.1 },        // A5
+        { freq: 1046.5, start: 0.12, dur: 0.15 }, // C6
+      ];
+
+      notes.forEach(({ freq, start, dur }) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + start);
+
+        gain.gain.setValueAtTime(0.001, now + start);
+        gain.gain.exponentialRampToValueAtTime(0.18, now + start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + dur);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now + start);
+        osc.stop(now + start + dur);
+      });
+    } catch {
+      // Audio playback failed or blocked by browser policy
+    }
+  }
 }
 
 export const soundbox = new Soundbox();

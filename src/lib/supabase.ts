@@ -18,6 +18,20 @@ const supabaseServiceKey = process.env['SUPABASE_SERVICE_ROLE_KEY'] ?? '';
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
 let browserClient: SupabaseClient<Database> | null = null;
+let hasAutoPinged = false;
+
+function triggerBackgroundKeepAlive(client: SupabaseClient<Database>) {
+  if (hasAutoPinged || typeof window === 'undefined') return;
+  hasAutoPinged = true;
+  // Non-blocking query to keep Supabase database active on app usage
+  setTimeout(() => {
+    client
+      .from('drivers')
+      .select('id', { count: 'exact', head: true })
+      .then(() => {})
+      .catch(() => {});
+  }, 2000);
+}
 
 export function getSupabaseClient(): SupabaseClient<Database> | null {
   if (!isSupabaseConfigured) {
@@ -30,6 +44,7 @@ export function getSupabaseClient(): SupabaseClient<Database> | null {
         autoRefreshToken: true,
       },
     });
+    triggerBackgroundKeepAlive(browserClient);
   }
   return browserClient;
 }

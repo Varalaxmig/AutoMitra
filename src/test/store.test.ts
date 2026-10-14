@@ -54,9 +54,11 @@ describe("AutoMitra Store & Fare Workflow", () => {
     const smsList = JSON.parse(localStorage.getItem("automitra-demo-v1") || "{}").sms || [];
     const confirmSms = smsList.find((m: Sms) => m.kind === "confirm");
     expect(confirmSms).toBeDefined();
-    expect(confirmSms.body).toContain("Sender's name: Test xyz");
-    expect(confirmSms.body).toContain("Amount: 80");
-    expect(confirmSms.body).toContain("Status: Success");
+    expect(confirmSms.body).toContain("From AutoMitra");
+    expect(confirmSms.body).toContain("UPI ID: Test xyz");
+    expect(confirmSms.body).toContain("Amount: Rs.80");
+    expect(confirmSms.body).toContain("Transaction Status:");
+    expect(confirmSms.body).toContain("Successful");
   });
 
   it("supports partial or custom credited amount on confirmation", () => {
@@ -76,7 +78,8 @@ describe("AutoMitra Store & Fare Workflow", () => {
     const smsList = JSON.parse(localStorage.getItem("automitra-demo-v1") || "{}").sms || [];
     const voidSms = smsList.find((m: Sms) => m.kind === "void");
     expect(voidSms).toBeDefined();
-    expect(voidSms.body).toContain("Status: Failed");
+    expect(voidSms.body).toContain("Transaction Status:");
+    expect(voidSms.body).toContain("Failed");
   });
 
   it("adds and rotates driver QR stickers", () => {

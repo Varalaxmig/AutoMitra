@@ -105,7 +105,7 @@ const dict = {
   awaiting: { en: "Awaiting", hi: "प्रतीक्षा", mr: "प्रतीक्षा" },
   verified: { en: "Verified", hi: "पुष्टि", mr: "पुष्टी" },
   failed: { en: "Failed", hi: "रद्द", mr: "रद्द" },
-  amountRule: { en: "Enter ₹10 to ₹5000", hi: "₹10 से ₹5000 तक लिखें", mr: "₹10 ते ₹5000 लिहा" },
+  amountRule: { en: "Enter ₹1 to ₹5000", hi: "₹1 से ₹5000 तक लिखें", mr: "₹1 ते ₹5000 लिहा" },
   openUpi: { en: "Open UPI App", hi: "UPI ऐप खोलें", mr: "UPI ॲप उघडा" },
   noUpi: {
     en: "No UPI app? Copy this ID and pay manually:",

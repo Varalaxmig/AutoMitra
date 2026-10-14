@@ -38,7 +38,8 @@ describe('AutoMitra State Machine & Field Verification (TASK-28 / Tests E1-E6, E
     expect(smsAfterClaim.length).toBe(initialSmsCount + 1);
     const claimSms = smsAfterClaim[0]!; // Newest SMS is at index 0
     expect(claimSms.kind).toBe('claim');
-    expect(claimSms.body).toContain("Sender's name: Rohit Sharma");
+    expect(claimSms.body).toContain("From AutoMitra");
+    expect(claimSms.body).toContain("Rohit Sharma");
     expect(claimSms.body).toContain('75');
 
     // 3. Proxy confirms fare on console -> SMS #2 (confirm)
@@ -50,7 +51,9 @@ describe('AutoMitra State Machine & Field Verification (TASK-28 / Tests E1-E6, E
     expect(smsAfterConfirm.length).toBe(initialSmsCount + 2);
     const confirmSms = smsAfterConfirm[0]!; // Newest SMS is at index 0
     expect(confirmSms.kind).toBe('confirm');
-    expect(confirmSms.body).toContain("Sender's name: Rohit Sharma");
+    expect(confirmSms.body).toContain("From AutoMitra");
+    expect(confirmSms.body).toContain("Rohit Sharma");
+    expect(confirmSms.body).toContain("Successful");
   });
 
   // Test E2: Driver / Proxy rejection (Claim -> Reject -> VOID SMS)

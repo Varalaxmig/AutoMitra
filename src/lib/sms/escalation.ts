@@ -1,5 +1,5 @@
 import type { Session, Driver } from '../store';
-import { sendFast2Sms } from './fast2sms';
+import { sendTelegramAlert } from './telegram';
 
 export interface EscalationStatus {
   sessionId: string;
@@ -17,10 +17,11 @@ const escalationTracking = new Map<string, EscalationStatus>();
 export async function checkSessionEscalation(
   session: Session,
   driver?: Driver,
-  onT20Ping?: (session: Session) => void
-): Promise<void> {
+  onT20Ping?: (session: Session) => void,
+  onT120Escalate?: (session: Session) => void
+): Promise<EscalationStatus | null> {
   if (session.status !== 'claimed' || !session.claimedAt) {
-    return;
+    return null;
   }
 
   const elapsedSec = Math.floor((Date.now() - session.claimedAt) / 1000);
@@ -44,15 +45,23 @@ export async function checkSessionEscalation(
     status.t120Escalated = true;
     escalationTracking.set(session.id, status);
 
-    await sendFast2Sms({
-      toPhone: driver.proxyPhone,
-      kind: 'claim',
-      senderName: `${session.senderName} (URGENT 2m Rem)`,
+    if (onT120Escalate) {
+      onT120Escalate(session);
+    }
+
+    sendTelegramAlert({
+      kind: 'escalation',
+      senderName: session.senderName,
       amount: session.amount,
-      sessionId: session.id,
-      lang: driver.lang,
-    });
+      token: session.token,
+    }).catch(() => {});
   }
+
+  return status;
+}
+
+export function getEscalationStatus(sessionId: string): EscalationStatus | undefined {
+  return escalationTracking.get(sessionId);
 }
 
 export function clearEscalationTracking(): void {

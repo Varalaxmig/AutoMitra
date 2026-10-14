@@ -10,31 +10,39 @@ import type { SmsKind, SmsPayload } from './types';
  */
 
 export function buildSmsBody(payload: SmsPayload): string {
-  const { kind, senderName, amount, otpCode, lang = 'hi' } = payload;
+  const { kind, senderName, senderUpi, amount, otpCode, lang = 'en' } = payload;
 
   if (kind === 'otp') {
     return `AutoMitra OTP: ${otpCode || '0000'}`;
   }
 
+  const upiId = senderUpi || senderName || 'commuter@upi';
   const amtFormatted = typeof amount === 'number' ? amount.toFixed(0) : amount;
-  const name = senderName || 'Passenger';
 
   if (lang === 'mr') {
     const statusText =
-      kind === 'claim' ? 'प्रलंबित (Pending)' : kind === 'confirm' ? 'यशस्वी (Success)' : 'अयशस्वी (Failed)';
-    return `Sender's name: ${name}\nAmount: Rs.${amtFormatted}\nStatus: ${statusText}`;
+      kind === 'confirm'
+        ? 'यशस्वी (Successful)'
+        : kind === 'claim'
+          ? 'प्रलंबित (Pending)'
+          : 'अयशस्वी (Failed)';
+    return `From AutoMitra\nUPI ID: ${upiId}\nAmount: Rs.${amtFormatted}\nTransaction Status: ${statusText}`;
   }
 
   if (lang === 'hi') {
     const statusText =
-      kind === 'claim' ? 'लंबित (Pending)' : kind === 'confirm' ? 'सफल (Success)' : 'विफल (Failed)';
-    return `Sender's name: ${name}\nAmount: Rs.${amtFormatted}\nStatus: ${statusText}`;
+      kind === 'confirm'
+        ? 'सफल (Successful)'
+        : kind === 'claim'
+          ? 'लंबित (Pending)'
+          : 'विफल (Failed)';
+    return `From AutoMitra\nUPI ID: ${upiId}\nAmount: Rs.${amtFormatted}\nTransaction Status: ${statusText}`;
   }
 
   const statusText =
-    kind === 'claim' ? 'Pending' : kind === 'confirm' ? 'Success' : 'Failed';
+    kind === 'confirm' ? 'Successful' : kind === 'claim' ? 'Pending' : 'Failed';
 
-  return `Sender's name: ${name}\nAmount: Rs.${amtFormatted}\nStatus: ${statusText}`;
+  return `From AutoMitra\nUPI ID: ${upiId}\nAmount: Rs.${amtFormatted}\nTransaction Status: ${statusText}`;
 }
 
 export function getDltTemplateId(kind: SmsKind): string | undefined {

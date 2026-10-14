@@ -1,6 +1,5 @@
-// Demo store: shared across browser tabs via localStorage + storage events.
-// Simulates the server, token service and SMS router described in the spec.
 import { useSyncExternalStore } from "react";
+import { sendTelegramAlert, sendSms, buildSmsBody } from "./sms";
 
 export type Lang = "en" | "hi" | "mr";
 export type Status =
@@ -22,6 +21,7 @@ export interface Session {
   token: string;
   amount: number;
   senderName: string;
+  senderUpi?: string;
   creditedAmount?: number;
   status: Status;
   createdAt: number;
@@ -109,9 +109,15 @@ export function useStore<T>(sel: (s: State) => T): T {
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 function sms(d: Driver, kind: "claim" | "confirm" | "void", s: Session, amt = s.amount): Sms {
-  const sender = s.senderName || "Test xyz";
-  const statusStr = kind === "confirm" ? "Success" : kind === "void" ? "Failed" : "Pending";
-  const body = `Sender's name: ${sender}\nAmount: ${amt}\nStatus: ${statusStr}`;
+  const upiId = s.senderUpi || s.senderName || "commuter@upi";
+  const body = buildSmsBody({
+    toPhone: d.driverPhone,
+    kind,
+    senderName: upiId,
+    senderUpi: upiId,
+    amount: amt,
+    lang: d.lang,
+  });
   return { id: uid(), to: d.driverPhone, body, at: Date.now(), kind };
 }
 
@@ -130,7 +136,12 @@ export function upiUri(d: Driver, s: Session) {
   return `upi://pay?${p.toString()}`;
 }
 
-export function initiate(slug: string, amount: number, senderName = "Test xyz"): Session {
+export function initiate(
+  slug: string,
+  amount: number,
+  senderName = "commuter@upi",
+  senderUpi?: string,
+): Session {
   load();
   const live = state.sessions
     .filter((s) => s.slug === slug && ["initiated", "handed_off", "claimed"].includes(s.status))
@@ -139,12 +150,15 @@ export function initiate(slug: string, amount: number, senderName = "Test xyz"):
   do {
     token = String(Math.floor(1000 + Math.random() * 9000));
   } while (live.includes(token));
+  const cleanSender = senderName.trim() || "commuter@upi";
+  const cleanUpi = senderUpi?.trim() || cleanSender;
   const s: Session = {
     id: uid(),
     slug,
     token,
     amount,
-    senderName: senderName.trim() || "Test xyz",
+    senderName: cleanSender,
+    senderUpi: cleanUpi,
     status: "handed_off",
     createdAt: Date.now(),
   };
@@ -167,19 +181,79 @@ function patch(
   });
 }
 
-export const claim = (id: string) =>
-  patch(id, (s, d) =>
+export const claim = (id: string) => {
+  const existing = state.sessions.find((x) => x.id === id);
+  if (existing && existing.status === "handed_off") {
+    sendTelegramAlert({
+      kind: "claim",
+      senderName: existing.senderUpi || existing.senderName,
+      amount: existing.amount,
+      token: existing.token,
+    }).catch(() => {});
+  }
+  return patch(id, (s, d) =>
     s.status === "handed_off"
       ? { s: { status: "claimed", claimedAt: Date.now() }, sms: sms(d, "claim", s) }
       : { s: {} },
   );
-export const cancel = (id: string) =>
-  patch(id, (s, d) => ({
-    s: { status: "cancelled", resolvedAt: Date.now() },
-    sms: s.status === "claimed" ? sms(d, "void", s) : undefined,
-  }));
-export const confirm = (id: string, credited?: number) =>
-  patch(id, (s, d) =>
+};
+
+export const cancel = (id: string) => {
+  const existing = state.sessions.find((x) => x.id === id);
+  if (existing && existing.status === "claimed") {
+    const d = state.drivers.find((x) => x.slug === existing.slug);
+    const upiId = existing.senderUpi || existing.senderName || "commuter@upi";
+    sendTelegramAlert({
+      kind: "void",
+      senderName: upiId,
+      amount: existing.amount,
+      token: existing.token,
+    }).catch(() => {});
+    if (d?.driverPhone) {
+      sendSms({
+        toPhone: d.driverPhone,
+        kind: "void",
+        senderName: upiId,
+        senderUpi: upiId,
+        amount: existing.amount,
+        lang: d.lang,
+      }).catch(() => {});
+    }
+  }
+  return patch(id, (s, d) =>
+    s.status === "claimed"
+      ? {
+          s: { status: "cancelled", resolvedAt: Date.now() },
+          sms: sms(d, "void", s),
+        }
+      : { s: { status: "cancelled" } },
+  );
+};
+
+export const confirm = (id: string, credited?: number) => {
+  const existing = state.sessions.find((x) => x.id === id);
+  if (existing && ["claimed", "handed_off"].includes(existing.status)) {
+    const d = state.drivers.find((x) => x.slug === existing.slug);
+    const upiId = existing.senderUpi || existing.senderName || "commuter@upi";
+    const finalAmt = credited ?? existing.amount;
+    sendTelegramAlert({
+      kind: "confirm",
+      senderName: upiId,
+      amount: finalAmt,
+      token: existing.token,
+    }).catch(() => {});
+    if (d?.driverPhone) {
+      sendSms({
+        toPhone: d.driverPhone,
+        kind: "confirm",
+        senderName: upiId,
+        senderUpi: upiId,
+        amount: finalAmt,
+        lang: d.lang,
+      }).catch(() => {});
+    }
+  }
+  return patch(id, (s, d) =>
     ["claimed", "handed_off"].includes(s.status)
       ? {
           s: { status: "confirmed", resolvedAt: Date.now(), creditedAmount: credited ?? s.amount },
@@ -187,11 +261,35 @@ export const confirm = (id: string, credited?: number) =>
         }
       : { s: {} },
   );
-export const reject = (id: string) =>
-  patch(id, (s, d) => ({
+};
+
+export const reject = (id: string) => {
+  const existing = state.sessions.find((x) => x.id === id);
+  if (existing && existing.status === "claimed") {
+    const d = state.drivers.find((x) => x.slug === existing.slug);
+    const upiId = existing.senderUpi || existing.senderName || "commuter@upi";
+    sendTelegramAlert({
+      kind: "void",
+      senderName: upiId,
+      amount: existing.amount,
+      token: existing.token,
+    }).catch(() => {});
+    if (d?.driverPhone) {
+      sendSms({
+        toPhone: d.driverPhone,
+        kind: "void",
+        senderName: upiId,
+        senderUpi: upiId,
+        amount: existing.amount,
+        lang: d.lang,
+      }).catch(() => {});
+    }
+  }
+  return patch(id, (s, d) => ({
     s: { status: "rejected", resolvedAt: Date.now() },
-    sms: s.status === "claimed" ? sms(d, "void", s) : undefined,
+    sms: sms(d, "void", s),
   }));
+};
 
 export function expireSweep() {
   const now = Date.now();
@@ -235,6 +333,18 @@ export function rotateQr(slug: string): string {
 }
 export function sendOtp(to: string): string {
   const code = String(Math.floor(1000 + Math.random() * 9000));
+  sendTelegramAlert({
+    kind: "otp",
+    token: code,
+    senderName: "Driver Onboarding",
+  }).catch(() => {});
+  sendSms({
+    toPhone: to,
+    kind: "otp",
+    senderName: "",
+    amount: 0,
+    otpCode: code,
+  }).catch(() => {});
   save({
     ...state,
     sms: [
@@ -269,5 +379,17 @@ export function resetStoreForTesting() {
 export function getState(): State {
   return state;
 }
+export function recordEscalatedSms(to: string, senderName: string, amount: number) {
+  load();
+  const body = `Sender's name: ${senderName}\nAmount: ${amount}\nStatus: Pending`;
+  save({
+    ...state,
+    sms: [
+      { id: uid(), to, body, at: Date.now(), kind: "claim" },
+      ...state.sms,
+    ],
+  });
+}
+
 export const vpaCount = (vpa: string) =>
   state.drivers.filter((d) => d.active && d.vpa === vpa).length;
