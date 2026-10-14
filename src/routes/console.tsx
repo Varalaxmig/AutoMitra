@@ -161,7 +161,7 @@ function Console() {
         >
           <ArrowLeft className="size-4" /> {t("navHome")}
         </Link>
-        <h1 className="mt-2 text-3xl font-black text-foreground">{t("proxyConsole")}</h1>
+        <h1 className="mt-2 text-3xl font-black gradient-text">{t("proxyConsole")}</h1>
         <p className="text-muted-foreground text-sm">{t("proxySubtitle")}</p>
 
         {/* Driver Vehicle Filter */}

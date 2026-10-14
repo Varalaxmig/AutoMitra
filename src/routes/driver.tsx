@@ -79,7 +79,7 @@ function DriverDashboard() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-foreground">
+              <h1 className="text-2xl font-black gradient-text">
                 {profile?.display_name ?? (driver ? tn(driver.firstName) : "Auto Driver")}
               </h1>
               <span className="rounded-full bg-amber/20 px-2.5 py-0.5 text-[11px] font-black uppercase text-amber border border-amber/30">

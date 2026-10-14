@@ -43,34 +43,34 @@
 
 :root {
   --radius: 0.75rem;
-  /* Deep Navy Blue Gradient Theme with White Body Text & White Navbar */
-  --background: #020b18;
-  --foreground: #ffffff;
-  --surface: rgba(8, 26, 56, 0.75);
-  --surface-2: #0c2954;
-  --card: rgba(8, 26, 56, 0.75);
-  --card-foreground: #ffffff;
-  --popover: #081d3e;
-  --popover-foreground: #ffffff;
-  --amber: #38bdf8;
-  --amber-deep: #0284c7;
-  --ok: #4ade80;
-  --err: #f87171;
-  --ink: #020b18;
-  --paper: #ffffff;
-  --primary: #38bdf8;
-  --primary-foreground: #020b18;
-  --secondary: #0c2954;
-  --secondary-foreground: #ffffff;
-  --muted: rgba(8, 26, 56, 0.75);
-  --muted-foreground: #cbd5e1;
-  --accent: #38bdf8;
-  --accent-foreground: #020b18;
-  --destructive: #f87171;
+  /* Swapped Theme: Pure White Body with Gradient Navy Text & Deep Blue Gradient Navbar */
+  --background: #ffffff;
+  --foreground: #04122c;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --card: #ffffff;
+  --card-foreground: #04122c;
+  --popover: #ffffff;
+  --popover-foreground: #04122c;
+  --amber: #0a254e;
+  --amber-deep: #020b18;
+  --ok: #16a34a;
+  --err: #ef4444;
+  --ink: #ffffff;
+  --paper: #f8fafc;
+  --primary: #0a254e;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #04122c;
+  --muted: #f8fafc;
+  --muted-foreground: #475569;
+  --accent: #1d4ed8;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.16);
-  --input: rgba(255, 255, 255, 0.16);
-  --ring: #38bdf8;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #1d4ed8;
 }
 
 @layer base {
@@ -81,13 +81,12 @@
     font-family: var(--font-sans);
   }
   body {
-    background: linear-gradient(145deg, #020b18 0%, #061938 35%, #0a254e 70%, #0e3266 100%);
-    background-attachment: fixed;
+    background-color: #ffffff;
     min-height: 100vh;
-    color: #ffffff;
+    color: #04122c;
   }
   :focus-visible {
-    outline: 3px solid var(--amber);
+    outline: 3px solid var(--accent);
     outline-offset: 2px;
   }
   :lang(hi),
@@ -97,11 +96,16 @@
   }
 }
 
+.gradient-text,
 .nav-gradient-text {
   background: linear-gradient(180deg, #020b1e 0%, #08214d 45%, #1d4ed8 85%, #2563eb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
+}
+
+.bg-navbar-gradient {
+  background: linear-gradient(145deg, #020b18 0%, #061938 35%, #0a254e 70%, #0e3266 100%);
 }
 
 @utility token-digits {

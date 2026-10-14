@@ -67,18 +67,18 @@ function Index() {
     <main className="mx-auto max-w-5xl px-5 py-8" lang={lang}>
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3 text-amber">
-          <CarTaxiFront className="size-9 text-amber" strokeWidth={2.25} />
-          <span className="text-2xl font-black tracking-wide text-foreground">
-            Auto<span className="text-amber">Mitra</span>
+          <CarTaxiFront className="size-9 text-blue-600" strokeWidth={2.25} />
+          <span className="text-2xl font-black tracking-wide gradient-text">
+            AutoMitra
           </span>
         </div>
-        <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-amber/40 bg-surface text-amber">
+        <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-blue-200 bg-blue-50/50 text-blue-800">
           Zero-Screen UPI Proxy
         </span>
       </header>
 
       <section className="mt-10">
-        <h1 className="max-w-3xl text-4xl font-black leading-tight md:text-5xl text-foreground">
+        <h1 className="max-w-3xl text-4xl font-black leading-tight md:text-5xl gradient-text">
           {t("heroTitle")}
         </h1>
         <p className="mt-4 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
