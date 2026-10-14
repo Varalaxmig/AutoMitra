@@ -14,6 +14,7 @@ export interface Driver {
   vpa: string;
   lang: Lang;
   active: boolean;
+  isSeed?: boolean;
 }
 export interface Session {
   id: string;
@@ -55,6 +56,7 @@ const seed: State = {
       vpa: "sneha.patil@okaxis",
       lang: "hi",
       active: true,
+      isSeed: true,
     },
   ],
   sessions: [],
@@ -70,7 +72,17 @@ function load() {
   loaded = true;
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) state = JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.drivers)) {
+        parsed.drivers = parsed.drivers.map((d: Driver) =>
+          d.slug === "K7M2QX9A" || d.driverPhone === "9820012345"
+            ? { ...d, isSeed: true }
+            : d,
+        );
+      }
+      state = parsed;
+    }
   } catch {
     /* ignore */
   }
@@ -184,12 +196,24 @@ function patch(
 export const claim = (id: string) => {
   const existing = state.sessions.find((x) => x.id === id);
   if (existing && existing.status === "handed_off") {
+    const d = state.drivers.find((x) => x.slug === existing.slug);
+    const upiId = existing.senderUpi || existing.senderName || "commuter@upi";
     sendTelegramAlert({
       kind: "claim",
-      senderName: existing.senderUpi || existing.senderName,
+      senderName: upiId,
       amount: existing.amount,
       token: existing.token,
     }).catch(() => {});
+    if (d?.driverPhone) {
+      sendSms({
+        toPhone: d.driverPhone,
+        kind: "claim",
+        senderName: upiId,
+        senderUpi: upiId,
+        amount: existing.amount,
+        lang: d.lang,
+      }).catch(() => {});
+    }
   }
   return patch(id, (s, d) =>
     s.status === "handed_off"
@@ -315,12 +339,26 @@ export function expireSweep() {
 export function addDriver(d: Omit<Driver, "slug" | "active">): Driver {
   load();
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const slug = Array.from(
-    { length: 8 },
-    () => chars[Math.floor(Math.random() * chars.length)],
-  ).join("");
-  const nd = { ...d, slug, active: true };
+  let slug = "";
+  do {
+    slug = Array.from(
+      { length: 8 },
+      () => chars[Math.floor(Math.random() * chars.length)],
+    ).join("");
+  } while (state.drivers.some((x) => x.slug === slug));
+
+  const nd: Driver = { ...d, slug, active: true, isSeed: false };
   save({ ...state, drivers: [...state.drivers, nd] });
+
+  // Send onboarding registration confirmation SMS to the driver's phone
+  sendSms({
+    toPhone: nd.driverPhone,
+    kind: "otp",
+    senderName: "AutoMitra",
+    amount: 0,
+    otpCode: `AutoMitra QR registered for ${nd.vehicle}! You will receive SMS alerts on this number for all UPI fares.`,
+  }).catch(() => {});
+
   return nd;
 }
 export function rotateQr(slug: string): string {

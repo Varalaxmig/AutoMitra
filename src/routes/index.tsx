@@ -32,8 +32,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { lang, t } = useLang();
-  const slug = useStore((s) => s.drivers.find((d) => d.active)?.slug ?? "K7M2QX9A");
+  const slug = useStore(
+    (s) => s.drivers.find((d) => d.active && !d.isSeed)?.slug ?? s.drivers.find((d) => d.active)?.slug ?? "K7M2QX9A",
+  );
 
   const steps = [
     {

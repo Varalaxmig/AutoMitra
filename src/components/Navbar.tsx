@@ -7,7 +7,9 @@ import { useAuth } from "@/lib/auth";
 export function Navbar() {
   const { lang, setLang, t } = useLang();
   const { user, profile, role, signOut } = useAuth();
-  const slug = useStore((s) => s.drivers.find((d) => d.active)?.slug ?? "K7M2QX9A");
+  const slug = useStore(
+    (s) => s.drivers.find((d) => d.active && !d.isSeed)?.slug ?? s.drivers.find((d) => d.active)?.slug ?? "K7M2QX9A",
+  );
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
