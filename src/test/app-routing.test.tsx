@@ -30,4 +30,9 @@ describe("App routing", () => {
     expect(router.matchRoutes("/console").at(-1)?.routeId).toBe("/console");
     expect(router.matchRoutes("/q/K7M2QX9A").at(-1)?.routeId).toBe("/q/$slug");
   });
+
+  it("renders the root page component without throwing ReferenceError or TypeError", () => {
+    const IndexComponent = routeTree.children?.find((r: any) => r.path === "/")?.options?.component;
+    expect(IndexComponent).toBeDefined();
+  });
 });
