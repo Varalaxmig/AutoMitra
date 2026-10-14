@@ -122,7 +122,7 @@ function LoginPage() {
         <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-amber/15 text-amber shadow-sm mb-4">
           <ShieldCheck className="size-7" />
         </div>
-        <h1 className="text-2xl md:text-3xl font-black gradient-text">
+        <h1 className="text-2xl md:text-3xl font-black text-foreground">
           Sign In
         </h1>
         <p className="mt-2 text-xs md:text-sm text-muted-foreground">

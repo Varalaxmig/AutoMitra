@@ -178,7 +178,7 @@ function Onboard() {
       {/* Header */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-black gradient-text">{t("onboardTitle")}</h1>
+          <h1 className="text-3xl font-black text-foreground">{t("onboardTitle")}</h1>
           <p className="text-sm text-muted-foreground">{t("onboardSubtitle")}</p>
         </div>
 

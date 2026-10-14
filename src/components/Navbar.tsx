@@ -59,7 +59,7 @@ export function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-navbar-gradient shadow-md print:hidden">
+    <header className="sticky top-0 z-40 border-b border-slate-200/90 bg-white shadow-xs print:hidden">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 gap-2">
         {/* Brand */}
         <Link
@@ -67,9 +67,9 @@ export function Navbar() {
           id="nav-brand-logo"
           className="flex items-center gap-2 hover:opacity-90 shrink-0"
         >
-          <CarTaxiFront className="size-7 text-sky-400" strokeWidth={2.5} />
-          <span className="text-xl font-black tracking-wide text-white">
-            Auto<span className="text-sky-400">Mitra</span>
+          <CarTaxiFront className="size-7 text-[#1e40af]" strokeWidth={2.5} />
+          <span className="text-xl font-black tracking-wide nav-gradient-text">
+            AutoMitra
           </span>
         </Link>
 
@@ -83,12 +83,12 @@ export function Navbar() {
               {...(link.params ? { params: link.params } : {})}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
                 link.match
-                  ? "bg-white/15 text-white border border-white/20 shadow-xs font-black"
-                  : "text-slate-300 hover:text-white hover:bg-white/10"
+                  ? "bg-blue-50/90 border border-blue-200/60 shadow-xs"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               }`}
             >
-              <link.icon className={`size-3.5 ${link.match ? "text-sky-400" : "text-slate-400"}`} />
-              <span className={link.match ? "text-white font-black" : "text-slate-300"}>{link.label}</span>
+              <link.icon className={`size-3.5 ${link.match ? "text-[#1e40af]" : "text-slate-500"}`} />
+              <span className={link.match ? "nav-gradient-text font-black" : ""}>{link.label}</span>
             </Link>
           ))}
         </nav>
@@ -99,7 +99,7 @@ export function Navbar() {
           <div
             role="radiogroup"
             aria-label="Language selector"
-            className="flex items-center rounded-full border border-white/20 bg-black/25 p-0.5 shadow-inner"
+            className="flex items-center rounded-full border border-slate-200 bg-slate-100 p-0.5 shadow-inner"
           >
             {langs.map((l) => (
               <button
@@ -110,8 +110,8 @@ export function Navbar() {
                 onClick={() => setLang(l.code)}
                 className={`rounded-full px-2 py-0.5 text-[11px] font-bold transition-all ${
                   lang === l.code
-                    ? "bg-white text-[#061938] font-black shadow-xs"
-                    : "text-slate-300 hover:text-white"
+                    ? "bg-white shadow-xs nav-gradient-text font-black"
+                    : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 {l.label}
@@ -121,12 +121,12 @@ export function Navbar() {
 
           {/* User Auth Info & Sign In / Sign Out */}
           {user ? (
-            <div className="flex items-center gap-1.5 pl-1 border-l border-white/20">
+            <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200">
               <div className="hidden sm:flex flex-col text-right">
-                <span className="text-xs font-black text-white truncate max-w-[110px]">
+                <span className="text-xs font-black nav-gradient-text truncate max-w-[110px]">
                   {profile?.display_name ?? user.email?.split("@")[0]}
                 </span>
-                <span className="text-[10px] font-black uppercase text-sky-400 tracking-wider">
+                <span className="text-[10px] font-black uppercase text-[#1e40af] tracking-wider">
                   {role === "driver" ? "Driver" : "Proxy"}
                 </span>
               </div>
@@ -135,7 +135,7 @@ export function Navbar() {
                 id="btn-sign-out"
                 onClick={() => signOut()}
                 title="Sign Out"
-                className="flex items-center gap-1 rounded-lg border border-white/20 bg-white/10 px-2.5 py-1.5 text-xs font-bold text-slate-200 hover:text-red-400 hover:border-red-400/40 hover:bg-red-950/30 transition-all shadow-xs"
+                className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-xs"
               >
                 <LogOut className="size-3.5" />
                 <span className="hidden sm:inline">Sign Out</span>
@@ -145,9 +145,9 @@ export function Navbar() {
             <Link
               to="/login"
               id="nav-btn-login"
-              className="flex items-center gap-1.5 rounded-lg bg-white px-3.5 py-1.5 text-xs font-black text-[#061938] hover:bg-slate-100 shadow-sm transition-all ml-1 shrink-0"
+              className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#020b1e] via-[#071f45] to-[#2563eb] px-3.5 py-1.5 text-xs font-black text-white shadow-sm hover:opacity-90 transition-all ml-1 shrink-0"
             >
-              <LogIn className="size-3.5 text-[#061938]" />
+              <LogIn className="size-3.5" />
               <span>Sign In</span>
             </Link>
           )}
@@ -156,7 +156,7 @@ export function Navbar() {
 
       {/* Mobile Nav Tabs Bar */}
       <nav
-        className="flex items-center justify-around border-t border-white/10 bg-navbar-gradient px-2 py-1.5 md:hidden"
+        className="flex items-center justify-around border-t border-slate-200/90 bg-white px-2 py-1.5 md:hidden"
         aria-label="Mobile navigation"
       >
         {navLinks.map((link) => (
@@ -166,11 +166,11 @@ export function Navbar() {
             to={link.to}
             {...(link.params ? { params: link.params } : {})}
             className={`flex flex-col items-center gap-0.5 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-colors ${
-              link.match ? "text-white font-black" : "text-slate-400 hover:text-white"
+              link.match ? "text-[#1e40af]" : "text-slate-500 hover:text-slate-900"
             }`}
           >
-            <link.icon className={`size-4 ${link.match ? "text-sky-400" : "text-slate-400"}`} />
-            <span className={link.match ? "text-white font-black" : "text-slate-400"}>{link.label}</span>
+            <link.icon className="size-4" />
+            <span className={link.match ? "nav-gradient-text font-black" : ""}>{link.label}</span>
           </Link>
         ))}
       </nav>
