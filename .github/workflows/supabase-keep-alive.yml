@@ -4,7 +4,7 @@ on:
   schedule:
     # Runs at 00:00 UTC every 3 days (well within the 7-day inactivity pause window)
     - cron: '0 0 */3 * *'
-  workflow_dispatch: # Allows manual trigger anytime from GitHub Actions tab
+  workflow_dispatch: # Allows manual trigger anytime from GitHub Actions tab or VS Code extension
 
 jobs:
   keep-alive:
@@ -18,7 +18,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
@@ -26,6 +26,6 @@ jobs:
 
       - name: Run Supabase Keep-Alive Ping
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://bqzxhepcdnusbkdqrudy.supabase.co' }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxenhoZXBjZG51c2JrZHFydWR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE3NDA3MDgsImV4cCI6MjEwNzMxNjcwOH0.AaPfNE1w-jOTzRsPbOaXhVo1JNHTO-HGIGBf0nQjwfs' }}
-        run: npm run supabase:ping
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: npx --yes tsx scripts/keep-supabase-alive.ts
