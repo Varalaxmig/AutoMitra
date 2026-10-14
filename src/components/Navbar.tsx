@@ -62,15 +62,15 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/90 bg-white shadow-xs print:hidden">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 gap-2">
+      <div className="mx-auto flex max-w-5xl items-center justify-between px-3 sm:px-4 py-2 sm:py-3 gap-1.5 sm:gap-2">
         {/* Brand */}
         <Link
           to="/"
           id="nav-brand-logo"
-          className="flex items-center gap-2 hover:opacity-90 shrink-0"
+          className="flex items-center gap-1.5 sm:gap-2 hover:opacity-90 shrink-0"
         >
-          <CarTaxiFront className="size-7 text-[#1e40af]" strokeWidth={2.5} />
-          <span className="text-xl font-black tracking-wide nav-gradient-text">
+          <CarTaxiFront className="size-6 sm:size-7 text-[#1e40af]" strokeWidth={2.5} />
+          <span className="text-lg sm:text-xl font-black tracking-wide nav-gradient-text">
             AutoMitra
           </span>
         </Link>
@@ -96,7 +96,7 @@ export function Navbar() {
         </nav>
 
         {/* Right Section: Language + Auth State */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Global Language Switcher */}
           <div
             role="radiogroup"
@@ -110,7 +110,7 @@ export function Navbar() {
                 role="radio"
                 aria-checked={lang === l.code}
                 onClick={() => setLang(l.code)}
-                className={`rounded-full px-2 py-0.5 text-[11px] font-bold transition-all ${
+                className={`rounded-full px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-[11px] font-bold transition-all ${
                   lang === l.code
                     ? "bg-white shadow-xs nav-gradient-text font-black"
                     : "text-slate-500 hover:text-slate-800"
@@ -123,9 +123,9 @@ export function Navbar() {
 
           {/* User Auth Info & Sign In / Sign Out */}
           {user ? (
-            <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200">
+            <div className="flex items-center gap-1 sm:gap-1.5 pl-1 border-l border-slate-200">
               <div className="hidden sm:flex flex-col text-right">
-                <span className="text-xs font-black nav-gradient-text truncate max-w-[110px]">
+                <span className="text-xs font-black nav-gradient-text truncate max-w-[90px] lg:max-w-[120px]">
                   {profile?.display_name ?? user.email?.split("@")[0]}
                 </span>
                 <span className="text-[10px] font-black uppercase text-[#1e40af] tracking-wider">
@@ -137,7 +137,7 @@ export function Navbar() {
                 id="btn-sign-out"
                 onClick={() => signOut()}
                 title="Sign Out"
-                className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-xs"
+                className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 sm:px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-xs"
               >
                 <LogOut className="size-3.5" />
                 <span className="hidden sm:inline">Sign Out</span>
@@ -147,7 +147,7 @@ export function Navbar() {
             <Link
               to="/login"
               id="nav-btn-login"
-              className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#020b1e] via-[#071f45] to-[#2563eb] px-3.5 py-1.5 text-xs font-black text-white shadow-sm hover:opacity-90 transition-all ml-1 shrink-0"
+              className="flex items-center gap-1 sm:gap-1.5 rounded-lg bg-gradient-to-r from-[#020b1e] via-[#071f45] to-[#2563eb] px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs font-black text-white shadow-sm hover:opacity-90 transition-all ml-0.5 sm:ml-1 shrink-0"
             >
               <LogIn className="size-3.5" />
               <span>Sign In</span>
@@ -158,7 +158,7 @@ export function Navbar() {
 
       {/* Mobile Nav Tabs Bar */}
       <nav
-        className="flex items-center justify-around border-t border-slate-200/90 bg-white px-2 py-1.5 md:hidden"
+        className="flex items-center justify-around border-t border-slate-200/90 bg-white/95 backdrop-blur-md px-1 sm:px-2 py-1 md:hidden"
         aria-label="Mobile navigation"
       >
         {navLinks.map((link) => (
@@ -167,7 +167,7 @@ export function Navbar() {
             id={`nav-mobile-${link.to.replace(/[/\\$]/g, "")}`}
             to={link.to}
             {...(link.params ? { params: link.params } : {})}
-            className={`flex flex-col items-center gap-0.5 rounded-lg px-2.5 py-1 text-[11px] font-bold transition-colors ${
+            className={`flex flex-col items-center justify-center gap-0.5 rounded-lg px-2 py-1 text-[10px] sm:text-[11px] font-bold transition-colors min-w-[56px] text-center ${
               link.match ? "text-[#1e40af]" : "text-slate-500 hover:text-slate-900"
             }`}
           >

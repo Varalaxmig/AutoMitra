@@ -273,39 +273,38 @@ function Onboard() {
             <div className="space-y-5">
               {/* Printable Dashboard Sticker Card */}
               <div
-                className="print-sticker flex flex-col justify-between overflow-hidden rounded-2xl bg-paper text-ink shadow-2xl border-4 border-border/80"
-                style={{ aspectRatio: "148 / 105", maxWidth: "620px" }}
+                className="print-sticker flex flex-col justify-between overflow-hidden rounded-2xl bg-paper text-ink shadow-2xl border-4 border-border/80 w-full max-w-[620px] sm:aspect-[148/105]"
               >
                 {/* Sticker Header Bar */}
-                <div className="bg-amber px-5 py-3 text-lg md:text-xl font-black text-ink flex items-center justify-between border-b-2 border-black/15 shrink-0">
+                <div className="bg-amber px-4 sm:px-5 py-2.5 sm:py-3 text-base sm:text-lg md:text-xl font-black text-ink flex items-center justify-between border-b-2 border-black/15 shrink-0">
                   <span className="flex items-center gap-2 tracking-tight">
-                    <CarTaxiFront className="size-6 text-ink" strokeWidth={2.5} />
+                    <CarTaxiFront className="size-5 sm:size-6 text-ink" strokeWidth={2.5} />
                     {t("stickerBrand")}
                   </span>
-                  <span className="text-[11px] md:text-xs font-black uppercase tracking-wider bg-black/10 px-2.5 py-1 rounded-full border border-black/10">
+                  <span className="text-[10px] sm:text-[11px] md:text-xs font-black uppercase tracking-wider bg-black/10 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-black/10">
                     {t("stickerTransit")}
                   </span>
                 </div>
 
                 {/* Sticker Main Content Body */}
-                <div className="flex flex-1 items-center gap-5 p-5 md:p-6">
+                <div className="flex flex-col sm:flex-row flex-1 items-center sm:items-stretch gap-4 sm:gap-5 p-4 sm:p-5 md:p-6">
                   {/* High-Resolution QR Box */}
-                  <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-black/15 bg-white p-2.5 shadow-sm shrink-0">
-                    <QRCodeSVG value={url} level="Q" marginSize={1} size={190} />
+                  <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-black/15 bg-white p-2 sm:p-2.5 shadow-sm shrink-0">
+                    <QRCodeSVG value={url} level="Q" marginSize={1} size={160} className="size-36 sm:size-40 md:size-44 w-auto h-auto" />
                     <span className="mt-1.5 text-[10px] md:text-[11px] font-black tracking-wide text-ink/75 uppercase text-center">
                       {t("stickerScanQr")}
                     </span>
                   </div>
 
                   {/* Right Info Column */}
-                  <div className="flex flex-1 flex-col justify-between self-stretch py-0.5 min-w-0">
+                  <div className="flex flex-1 flex-col justify-between self-stretch py-0.5 min-w-0 text-center sm:text-left">
                     {/* Vehicle Plate */}
                     <div>
                       <span className="inline-flex items-center gap-1.5 text-[10px] md:text-xs font-black uppercase tracking-wider text-ink/60">
                         <CarTaxiFront className="size-3.5 text-ink/75 shrink-0" />
                         <span>{t("stickerAutoLabel")}</span>
                       </span>
-                      <p className="font-mono text-3xl md:text-4xl font-black tracking-widest text-ink leading-tight">
+                      <p className="font-mono text-2xl sm:text-3xl md:text-4xl font-black tracking-widest text-ink leading-tight">
                         {sel.vehicle}
                       </p>
                     </div>
@@ -315,20 +314,20 @@ function Onboard() {
                       <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-ink/60">
                         {t("stickerDriverLabel")}:
                       </span>
-                      <p className="text-2xl md:text-3xl font-black text-ink tracking-tight leading-tight">
+                      <p className="text-xl sm:text-2xl md:text-3xl font-black text-ink tracking-tight leading-tight">
                         {tn(sel.firstName)}
                       </p>
                     </div>
 
                     {/* Slug ID Badge */}
                     <div className="mt-1">
-                      <span className="font-mono text-[11px] md:text-xs font-bold text-ink/80 bg-black/5 px-2.5 py-0.5 rounded-md border border-black/10">
+                      <span className="font-mono text-[10px] sm:text-[11px] md:text-xs font-bold text-ink/80 bg-black/5 px-2.5 py-0.5 rounded-md border border-black/10 inline-block">
                         {t("stickerSlugLabel")}: {sel.slug}
                       </span>
                     </div>
 
                     {/* Passenger Instruction Box */}
-                    <div className="mt-2.5 rounded-xl bg-black/[0.04] p-2.5 border border-black/10 space-y-1">
+                    <div className="mt-2.5 rounded-xl bg-black/[0.04] p-2.5 border border-black/10 space-y-1 text-left">
                       <p className="inline-flex items-center gap-1.5 text-xs md:text-sm font-black text-ink leading-snug">
                         <QrCode className="size-3.5 text-ink/80 shrink-0" />
                         <span>{t("stickerInstructionTitle")}</span>
@@ -354,7 +353,7 @@ function Onboard() {
                 </div>
 
                 {/* Sticker Security Bottom Strip */}
-                <div className="bg-black/[0.03] px-5 py-1.5 flex items-center justify-between text-[10px] md:text-[11px] font-bold text-ink/75 border-t border-black/10 shrink-0">
+                <div className="bg-black/[0.03] px-4 sm:px-5 py-1.5 flex items-center justify-between text-[10px] md:text-[11px] font-bold text-ink/75 border-t border-black/10 shrink-0">
                   <span className="inline-flex items-center gap-1.5">
                     <ShieldCheck className="size-3.5 text-ink/80 shrink-0" />
                     <span>{t("stickerSecurityVerify")}</span>
@@ -364,11 +363,11 @@ function Onboard() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-2.5 print:hidden max-w-[620px]">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 print:hidden max-w-[620px]">
                 <button
                   id="btn-print-sticker"
                   onClick={() => window.print()}
-                  className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-amber font-black text-ink shadow-md hover:bg-amber-deep transition-all active:scale-[0.99]"
+                  className="flex h-11 sm:h-12 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-xl bg-amber font-black text-ink shadow-md hover:bg-amber-deep transition-all active:scale-[0.99] text-xs sm:text-sm"
                 >
                   <Printer className="size-4" /> {t("printStickerBtn")}
                 </button>
@@ -387,14 +386,14 @@ function Onboard() {
                       toast.error("Failed to generate PDF");
                     }
                   }}
-                  className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border-2 border-amber bg-amber/10 font-black text-amber hover:bg-amber hover:text-ink transition-all active:scale-[0.99]"
+                  className="flex h-11 sm:h-12 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-xl border-2 border-amber bg-amber/10 font-black text-amber hover:bg-amber hover:text-ink transition-all active:scale-[0.99] text-xs sm:text-sm"
                 >
                   <Download className="size-4" /> Download A6 PDF
                 </button>
                 <button
                   id="btn-rotate-qr"
                   onClick={() => handleRotate(sel.slug)}
-                  className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-surface font-bold text-foreground hover:border-amber transition-all"
+                  className="flex h-11 sm:h-12 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-xl border border-border bg-surface font-bold text-foreground hover:border-amber transition-all text-xs sm:text-sm"
                 >
                   <RefreshCw className="size-4 text-amber" /> {t("rotateQrBtn")}
                 </button>

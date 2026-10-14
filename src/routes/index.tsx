@@ -66,29 +66,29 @@ function Index() {
   };
 
   return (
-    <main className="mx-auto max-w-5xl px-5 py-8" lang={lang}>
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-3 text-amber">
-          <CarTaxiFront className="size-9 text-amber" strokeWidth={2.25} />
-          <span className="text-2xl font-black tracking-wide text-foreground">
+    <main className="mx-auto max-w-5xl px-4 sm:px-5 py-6 sm:py-8" lang={lang}>
+      <header className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <div className="flex items-center gap-2.5 sm:gap-3 text-amber">
+          <CarTaxiFront className="size-8 sm:size-9 text-amber" strokeWidth={2.25} />
+          <span className="text-xl sm:text-2xl font-black tracking-wide text-foreground">
             Auto<span className="text-amber">Mitra</span>
           </span>
         </div>
-        <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-amber/40 bg-surface text-amber">
+        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest px-2.5 sm:px-3 py-1 rounded-full border border-amber/40 bg-surface text-amber">
           Zero-Screen UPI Proxy
         </span>
       </header>
 
-      <section className="mt-10">
-        <h1 className="max-w-3xl text-4xl font-black leading-tight md:text-5xl text-foreground">
+      <section className="mt-8 sm:mt-10">
+        <h1 className="max-w-3xl text-3xl sm:text-4xl md:text-5xl font-black leading-tight text-foreground">
           {t("heroTitle")}
         </h1>
-        <p className="mt-4 max-w-2xl text-base md:text-lg text-muted-foreground leading-relaxed">
+        <p className="mt-3 sm:mt-4 max-w-2xl text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed">
           {t("heroDesc")}
         </p>
       </section>
 
-      <div className="mt-10 grid gap-4 md:grid-cols-3">
+      <div className="mt-8 sm:mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card
           id="card-nav-commuter"
           to="/q/$slug"
@@ -113,17 +113,17 @@ function Index() {
         />
       </div>
 
-      <ol className="mt-12 grid gap-6 md:grid-cols-4">
+      <ol className="mt-10 sm:mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((s, n) => (
           <li
             key={n}
             className="border-t-2 border-border/80 pt-4 bg-surface/30 p-4 rounded-xl border border-border/40"
           >
-            <s.i className="size-7 text-amber" strokeWidth={2.25} aria-hidden />
-            <p className="mt-3 font-extrabold text-foreground">
+            <s.i className="size-6 sm:size-7 text-amber" strokeWidth={2.25} aria-hidden />
+            <p className="mt-2.5 sm:mt-3 font-extrabold text-foreground text-sm sm:text-base">
               {n + 1}. {s.t}
             </p>
-            <p className="mt-1 text-sm text-muted-foreground">{s.d}</p>
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground leading-relaxed">{s.d}</p>
           </li>
         ))}
       </ol>

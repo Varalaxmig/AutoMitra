@@ -458,20 +458,20 @@ function TokenScreen({
 
   return (
     <main
-      className="flex min-h-dvh flex-col border-[6px] border-amber bg-background px-4 py-5"
+      className="flex min-h-dvh flex-col border-4 sm:border-[6px] border-amber bg-background px-3 sm:px-4 py-4 sm:py-5"
       aria-live="assertive"
     >
       <div className="flex items-center justify-between">
-        <span className="inline-flex h-10 items-center gap-2 rounded-full bg-amber px-4 font-bold text-ink shadow-sm">
-          <Clock className="size-5" aria-hidden />
+        <span className="inline-flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-full bg-amber px-3 sm:px-4 text-xs sm:text-sm font-bold text-ink shadow-sm">
+          <Clock className="size-4 sm:size-5" aria-hidden />
           {t("awaiting")}
         </span>
-        <span className="font-mono text-xl font-bold tabular-nums text-amber">
+        <span className="font-mono text-lg sm:text-xl font-bold tabular-nums text-amber">
           {Math.floor(secs / 60)}:{String(secs % 60).padStart(2, "0")}
         </span>
       </div>
-      <p className="mt-8 flex items-center justify-center gap-2 text-xl font-bold tracking-widest text-muted-foreground">
-        <Hash className="size-6" aria-hidden />
+      <p className="mt-6 sm:mt-8 flex items-center justify-center gap-2 text-lg sm:text-xl font-bold tracking-widest text-muted-foreground">
+        <Hash className="size-5 sm:size-6" aria-hidden />
         {t("token")}
       </p>
       <div
@@ -484,19 +484,19 @@ function TokenScreen({
           </span>
         ))}
       </div>
-      <p className="fare-readout mt-6 text-center text-amber font-black">₹{amount}</p>
-      <p className="mt-4 text-center text-xl font-extrabold text-foreground">{t("showDriver")}</p>
-      <p className="mt-auto flex items-center justify-center gap-2 text-center text-muted-foreground">
+      <p className="fare-readout mt-4 sm:mt-6 text-center text-amber font-black">₹{amount}</p>
+      <p className="mt-3 sm:mt-4 text-center text-lg sm:text-xl font-extrabold text-foreground">{t("showDriver")}</p>
+      <p className="mt-auto flex items-center justify-center gap-2 text-center text-xs sm:text-sm text-muted-foreground">
         <Clock className="size-4" aria-hidden />
         {t("waitingConfirm")}
       </p>
-      <p className="mt-1 text-center text-xs text-muted-foreground">{t("brightness")}</p>
+      <p className="mt-1 text-center text-[11px] sm:text-xs text-muted-foreground">{t("brightness")}</p>
 
       <button
         id="btn-cancel-token"
         type="button"
         onClick={onCancel}
-        className="mt-4 text-center text-xs text-muted-foreground hover:text-err underline"
+        className="mt-3 sm:mt-4 text-center text-xs text-muted-foreground hover:text-err underline"
       >
         Paying cash instead? Cancel verification
       </button>
@@ -539,17 +539,17 @@ function Final({
   return (
     <Full
       tone={tone}
-      icon={<Icon className="size-[35vw] max-w-64" strokeWidth={2.25} aria-hidden />}
+      icon={<Icon className="size-24 sm:size-32 md:size-40" strokeWidth={2.25} aria-hidden />}
       title={t(tone === "ok" ? "confirmed" : "notPaid")}
     >
-      {tone === "err" && <p className="text-2xl font-extrabold">{t("doNotRelease")}</p>}
-      <p className="mt-4 font-mono text-5xl font-black tabular-nums">#{token}</p>
-      <p className="text-4xl font-black">₹{amount}</p>
+      {tone === "err" && <p className="text-xl sm:text-2xl font-extrabold">{t("doNotRelease")}</p>}
+      <p className="mt-3 sm:mt-4 font-mono text-4xl sm:text-5xl font-black tabular-nums">#{token}</p>
+      <p className="text-3xl sm:text-4xl font-black">₹{amount}</p>
       {onRetry && (
         <button
           id="btn-final-retry"
           onClick={onRetry}
-          className="mt-8 h-14 rounded-2xl border-2 border-ink px-8 text-lg font-extrabold bg-paper/20 hover:bg-paper/40"
+          className="mt-6 sm:mt-8 h-12 sm:h-14 rounded-2xl border-2 border-ink px-6 sm:px-8 text-base sm:text-lg font-extrabold bg-paper/20 hover:bg-paper/40"
         >
           {t("retry")}
         </button>
@@ -558,7 +558,7 @@ function Final({
         <button
           id="btn-final-done"
           onClick={onDone}
-          className="mt-8 h-14 rounded-2xl border-2 border-ink px-8 text-lg font-extrabold bg-paper/20 hover:bg-paper/40"
+          className="mt-6 sm:mt-8 h-12 sm:h-14 rounded-2xl border-2 border-ink px-6 sm:px-8 text-base sm:text-lg font-extrabold bg-paper/20 hover:bg-paper/40"
         >
           Done
         </button>
@@ -582,12 +582,12 @@ function Full({
     <main
       role="status"
       aria-live="assertive"
-      className={`flex min-h-dvh flex-col items-center justify-center px-6 text-center ${
+      className={`flex min-h-dvh flex-col items-center justify-center px-4 sm:px-6 text-center ${
         tone === "ok" ? "bg-ok text-ink" : "bg-err text-white"
       }`}
     >
       {icon}
-      <h1 className="mt-4 text-5xl font-black">{title}</h1>
+      <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-black">{title}</h1>
       {children}
     </main>
   );

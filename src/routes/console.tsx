@@ -375,27 +375,29 @@ function Console() {
                         >
                           Actual amount received in bank (INR):
                         </label>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-amber">₹</span>
-                          <input
-                            id={`input-amount-${s.id}`}
-                            type="number"
-                            value={customAmount}
-                            onChange={(e) => setCustomAmount(e.target.value)}
-                            className="h-10 w-32 rounded-lg border border-border bg-surface px-3 font-mono font-bold text-foreground outline-none focus:border-amber"
-                            placeholder={String(s.amount)}
-                          />
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                          <div className="flex items-center gap-1.5 flex-1 sm:flex-initial">
+                            <span className="font-bold text-amber">₹</span>
+                            <input
+                              id={`input-amount-${s.id}`}
+                              type="number"
+                              value={customAmount}
+                              onChange={(e) => setCustomAmount(e.target.value)}
+                              className="h-10 w-full sm:w-28 rounded-lg border border-border bg-surface px-3 font-mono font-bold text-foreground outline-none focus:border-amber"
+                              placeholder={String(s.amount)}
+                            />
+                          </div>
                           <button
                             id={`btn-confirm-custom-${s.id}`}
                             onClick={() => handleConfirm(s.id, Number(customAmount) || s.amount)}
-                            className="h-10 rounded-lg bg-ok px-4 text-sm font-black text-ink shadow hover:opacity-90"
+                            className="h-10 flex-1 sm:flex-initial rounded-lg bg-ok px-3 sm:px-4 text-xs sm:text-sm font-black text-ink shadow hover:opacity-90"
                           >
                             {t("confirmBtn")} ₹{customAmount || s.amount}
                           </button>
                           <button
                             id={`btn-cancel-custom-${s.id}`}
                             onClick={() => setEditingSessionId(null)}
-                            className="h-10 rounded-lg border border-border px-3 text-sm text-muted-foreground hover:text-foreground"
+                            className="h-10 rounded-lg border border-border px-3 text-xs sm:text-sm text-muted-foreground hover:text-foreground"
                           >
                             Cancel
                           </button>
