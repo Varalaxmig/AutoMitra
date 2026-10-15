@@ -15,6 +15,7 @@ export interface Driver {
   lang: Lang;
   active: boolean;
   isSeed?: boolean;
+  createdBy?: string;
 }
 export interface Session {
   id: string;
@@ -289,7 +290,7 @@ export const confirm = (id: string, credited?: number) => {
 
 export const reject = (id: string) => {
   const existing = state.sessions.find((x) => x.id === id);
-  if (existing && existing.status === "claimed") {
+  if (existing && ["claimed", "handed_off", "initiated"].includes(existing.status)) {
     const d = state.drivers.find((x) => x.slug === existing.slug);
     const upiId = existing.senderUpi || existing.senderName || "commuter@upi";
     sendTelegramAlert({
@@ -306,6 +307,7 @@ export const reject = (id: string) => {
         senderUpi: upiId,
         amount: existing.amount,
         lang: d.lang,
+        statusOverride: "Failed",
       }).catch(() => {});
     }
   }
@@ -314,6 +316,103 @@ export const reject = (id: string) => {
     sms: sms(d, "void", s),
   }));
 };
+
+export interface AutoResolveResult {
+  success: boolean;
+  status: "confirmed" | "rejected";
+  session: Session;
+  driver: Driver;
+  smsBody: string;
+  driverPhone: string;
+  smsResult?: {
+    success: boolean;
+    provider: string;
+    messageId?: string;
+    error?: string;
+    deliveryStatus: string;
+  };
+}
+
+export async function autoResolve(
+  id: string,
+  status: "confirmed" | "rejected",
+  senderUpi?: string,
+): Promise<AutoResolveResult | null> {
+  load();
+  const existing = state.sessions.find((x) => x.id === id);
+  if (!existing) return null;
+  const d = state.drivers.find((x) => x.slug === existing.slug);
+  if (!d) return null;
+
+  const upiId = senderUpi?.trim() || existing.senderUpi || existing.senderName || "commuter@upi";
+  const finalAmt = existing.amount;
+  const kind = status === "confirmed" ? "confirm" : "void";
+  const statusLabel: "Successful" | "Failed" = status === "confirmed" ? "Successful" : "Failed";
+
+  const customBody = `From AutoMitra\nUPI ID: ${upiId}\nAmount: Rs.${finalAmt.toFixed(0)}\nTransaction Status: ${statusLabel}`;
+
+  // Update session state
+  const updatedSession: Session = {
+    ...existing,
+    status,
+    senderUpi: upiId,
+    creditedAmount: finalAmt,
+    resolvedAt: Date.now(),
+  };
+
+  const smsRecord: Sms = {
+    id: uid(),
+    to: d.driverPhone,
+    body: customBody,
+    at: Date.now(),
+    kind,
+  };
+
+  save({
+    ...state,
+    sessions: state.sessions.map((x) => (x.id === id ? updatedSession : x)),
+    sms: [smsRecord, ...state.sms],
+  });
+
+  // Automatically dispatch real cellular SMS to driver's phone via TextBee Android Gateway
+  let smsResult: any = undefined;
+  try {
+    smsResult = await sendSms({
+      toPhone: d.driverPhone,
+      kind,
+      senderName: upiId,
+      senderUpi: upiId,
+      amount: finalAmt,
+      lang: d.lang,
+      statusOverride: statusLabel,
+    });
+  } catch (err: any) {
+    smsResult = {
+      success: false,
+      provider: "textbee",
+      deliveryStatus: "failed",
+      error: err?.message || String(err),
+    };
+  }
+
+  // Telegram alert backup
+  sendTelegramAlert({
+    kind,
+    senderName: upiId,
+    amount: finalAmt,
+    token: existing.token,
+  }).catch(() => {});
+
+  return {
+    success: status === "confirmed",
+    status,
+    session: updatedSession,
+    driver: d,
+    smsBody: customBody,
+    driverPhone: d.driverPhone,
+    smsResult,
+  };
+}
 
 export function expireSweep() {
   const now = Date.now();
@@ -336,7 +435,7 @@ export function expireSweep() {
   save(next);
 }
 
-export function addDriver(d: Omit<Driver, "slug" | "active">): Driver {
+export function addDriver(d: Omit<Driver, "slug" | "active"> & { createdBy?: string }): Driver {
   load();
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let slug = "";
@@ -347,7 +446,13 @@ export function addDriver(d: Omit<Driver, "slug" | "active">): Driver {
     ).join("");
   } while (state.drivers.some((x) => x.slug === slug));
 
-  const nd: Driver = { ...d, slug, active: true, isSeed: false };
+  const nd: Driver = {
+    ...d,
+    slug,
+    active: true,
+    isSeed: false,
+    createdBy: d.createdBy,
+  };
   save({ ...state, drivers: [...state.drivers, nd] });
 
   // Send onboarding registration confirmation SMS to the driver's phone
@@ -360,6 +465,16 @@ export function addDriver(d: Omit<Driver, "slug" | "active">): Driver {
   }).catch(() => {});
 
   return nd;
+}
+
+export function getDriversForUser(userId?: string | null): Driver[] {
+  load();
+  if (!userId) {
+    // If not authenticated, return non-seed active drivers
+    return state.drivers.filter((d) => d.active && !d.isSeed);
+  }
+  // If user is authenticated, return ONLY drivers created by this user
+  return state.drivers.filter((d) => d.active && !d.isSeed && d.createdBy === userId);
 }
 export function rotateQr(slug: string): string {
   const d = state.drivers.find((x) => x.slug === slug)!;

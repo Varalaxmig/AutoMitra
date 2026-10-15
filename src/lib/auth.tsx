@@ -349,11 +349,11 @@ export function Forbidden403({
 
         {currentRole === "proxy" && (
           <Link
-            to="/console"
+            to="/onboard"
             className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-amber px-5 py-2.5 text-xs font-black text-ink shadow-md hover:bg-amber/90 transition-all"
           >
             <ShieldCheck className="size-4" />
-            <span>Go to Proxy Console</span>
+            <span>Go to My Driver & QR</span>
           </Link>
         )}
 

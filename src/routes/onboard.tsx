@@ -53,8 +53,10 @@ function Onboard() {
   const { user, isLoading } = useAuth();
   const { lang, t, tn } = useLang();
   const allDrivers = useStore((s) => s.drivers);
-  // Only user-registered drivers (not demo seed) are shown on the onboard stickers page
-  const drivers = allDrivers.filter((d) => d.active && !d.isSeed);
+  // Show ONLY drivers created by this logged-in user
+  const drivers = allDrivers.filter(
+    (d) => d.active && !d.isSeed && (user?.id ? d.createdBy === user.id : true),
+  );
   const [activeTab, setActiveTab] = useState<"fleet" | "register">(() =>
     drivers.length > 0 ? "fleet" : "register",
   );
@@ -166,7 +168,7 @@ function Onboard() {
     if (!/^[6-9]\d{9}$/.test(f.proxyPhone)) return setError("Enter a valid 10-digit family phone.");
     if (!consent) return setError("Both consents are required.");
 
-    const d = addDriver({ ...f, vehicle });
+    const d = addDriver({ ...f, vehicle, createdBy: user?.id });
     setSelected(d.slug);
     setError("");
     setActiveTab("fleet");

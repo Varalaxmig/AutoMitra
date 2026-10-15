@@ -19,6 +19,10 @@ export function buildSmsBody(payload: SmsPayload): string {
   const upiId = senderUpi || senderName || 'commuter@upi';
   const amtFormatted = typeof amount === 'number' ? amount.toFixed(0) : amount;
 
+  if (payload.statusOverride) {
+    return `From AutoMitra\nUPI ID: ${upiId}\nAmount: Rs.${amtFormatted}\nTransaction Status: ${payload.statusOverride}`;
+  }
+
   if (lang === 'mr') {
     const statusText =
       kind === 'confirm'

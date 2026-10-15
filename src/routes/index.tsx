@@ -95,21 +95,21 @@ function Index() {
           params={{ slug }}
           icon={QrCode}
           title={t("navCommuter")}
-          body="Pay a fare as the passenger and display your 4-digit token."
-        />
-        <Card
-          id="card-nav-console"
-          to="/console"
-          icon={ShieldCheck}
-          title={t("navConsole")}
-          body="Confirm credits and watch the simulated driver's 2G SMS inbox."
+          body="Pay a fare as the passenger with GPay / PhonePe and receive auto-detected instant confirmation."
         />
         <Card
           id="card-nav-onboard"
           to="/onboard"
           icon={Smartphone}
-          title={t("navOnboard")}
-          body="Register a driver, bind family UPI, and print the dashboard QR sticker."
+          title="My Driver & QR Sticker"
+          body="View your registered auto driver, display the live QR code, and print A6 waterproof dashboard stickers."
+        />
+        <Card
+          id="card-nav-login"
+          to="/login"
+          icon={ShieldCheck}
+          title="Account & Vehicle Fleet"
+          body="Sign in to your account to securely manage your auto drivers and monitor 2G SMS deliveries."
         />
       </div>
 

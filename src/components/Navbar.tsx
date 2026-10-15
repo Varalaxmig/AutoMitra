@@ -13,7 +13,7 @@ export function Navbar() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
 
-  type NavTarget = "/" | "/console" | "/driver" | "/onboard" | "/q/$slug";
+  type NavTarget = "/" | "/driver" | "/onboard" | "/q/$slug";
   const navLinks: Array<{
     to: NavTarget;
     params?: { slug: string };
@@ -38,17 +38,10 @@ export function Navbar() {
             match: currentPath === "/driver",
           },
         ]
-      : [
-          {
-            to: "/console" as const,
-            label: t("navConsole"),
-            icon: ShieldCheck,
-            match: currentPath === "/console",
-          },
-        ]),
+      : []),
     {
       to: "/onboard",
-      label: t("navOnboard"),
+      label: "My Driver & QR",
       icon: Smartphone,
       match: currentPath === "/onboard",
     },
@@ -130,7 +123,7 @@ export function Navbar() {
                     {profile?.display_name ?? user.email?.split("@")[0]}
                   </span>
                   <span className="text-[10px] font-black uppercase text-[#1e40af] tracking-wider">
-                    {role === "driver" ? "Driver" : "Proxy"}
+                    {role === "driver" ? "Driver" : "Owner"}
                   </span>
                 </div>
 

@@ -48,7 +48,7 @@ function LoginPage() {
       } else if (userRole === "driver") {
         navigate({ to: "/driver" });
       } else {
-        navigate({ to: "/console" });
+        navigate({ to: "/onboard" });
       }
     }
   }, [user, userRole, redirectTo, navigate]);
@@ -78,10 +78,10 @@ function LoginPage() {
       toast.success("Signed in successfully!");
       if (redirectTo) {
         navigate({ to: redirectTo as any });
-      } else if (result.role === "driver") {
+      } else if ((result as any).role === "driver") {
         navigate({ to: "/driver" });
       } else {
-        navigate({ to: "/console" });
+        navigate({ to: "/onboard" });
       }
     }
   };

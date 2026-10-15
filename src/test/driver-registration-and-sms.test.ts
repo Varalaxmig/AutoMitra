@@ -6,6 +6,7 @@ import {
   confirm,
   reject,
   cancel,
+  autoResolve,
   getState,
   resetStoreForTesting,
   type Sms,
@@ -110,4 +111,57 @@ describe("Driver Registration & Per-Driver Transaction SMS Workflow", () => {
     expect(voidMsg.body).toContain("Amount: Rs.75");
     expect(voidMsg.body).toContain("Transaction Status: अयशस्वी (Failed)");
   });
+
+  it("automatically detects payment completion and dispatches custom SMS via autoResolve", async () => {
+    const driver = addDriver({
+      firstName: "Ramesh",
+      vehicle: "MH02CD9999",
+      driverPhone: "9821199999",
+      proxyPhone: "9930099999",
+      vpa: "ramesh.auto@okaxis",
+      lang: "en",
+    });
+
+    // Commuter initiates fare
+    const session = initiate(driver.slug, 85, "commuter@paytm");
+    expect(session.status).toBe("handed_off");
+
+    // Automatically detected by webapp (zero-console, zero-family-confirmation)
+    const result = await autoResolve(session.id, "confirmed", "commuter@paytm");
+    expect(result).toBeDefined();
+    expect(result?.success).toBe(true);
+    expect(result?.status).toBe("confirmed");
+    expect(result?.driverPhone).toBe("9821199999");
+    expect(result?.smsBody).toBe(
+      "From AutoMitra\nUPI ID: commuter@paytm\nAmount: Rs.85\nTransaction Status: Successful"
+    );
+
+    const state = getState();
+    const updated = state.sessions.find((s) => s.id === session.id);
+    expect(updated?.status).toBe("confirmed");
+    expect(updated?.creditedAmount).toBe(85);
+  });
+
+  it("automatically dispatches failed SMS to driver's phone when payment fails", async () => {
+    const driver = addDriver({
+      firstName: "Dinesh",
+      vehicle: "MH02EF8888",
+      driverPhone: "9821188888",
+      proxyPhone: "9930088888",
+      vpa: "dinesh.auto@okhdfcbank",
+      lang: "en",
+    });
+
+    const session = initiate(driver.slug, 150, "failed.payer@upi");
+    const result = await autoResolve(session.id, "rejected", "failed.payer@upi");
+
+    expect(result).toBeDefined();
+    expect(result?.success).toBe(false);
+    expect(result?.status).toBe("rejected");
+    expect(result?.driverPhone).toBe("9821188888");
+    expect(result?.smsBody).toBe(
+      "From AutoMitra\nUPI ID: failed.payer@upi\nAmount: Rs.150\nTransaction Status: Failed"
+    );
+  });
 });
+

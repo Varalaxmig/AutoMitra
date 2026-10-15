@@ -10,6 +10,7 @@ export interface SmsPayload {
   sessionId?: string;
   otpCode?: string;
   lang?: 'en' | 'hi' | 'mr';
+  statusOverride?: 'Successful' | 'Failed';
 }
 
 export interface SmsSendResult {

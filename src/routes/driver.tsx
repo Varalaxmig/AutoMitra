@@ -54,7 +54,7 @@ function DriverDashboard() {
         (profile?.display_name && profile.display_name.toLowerCase().includes(d.firstName.toLowerCase()))
     ) ?? drivers[0];
 
-  const driverSessions = driver ? sessions[driver.id] ?? [] : [];
+  const driverSessions = driver ? sessions.filter((s) => s.slug === driver.slug) : [];
   const confirmedSessions = driverSessions.filter((s) => s.status === "confirmed");
   const awaitingSessions = driverSessions.filter(
     (s) => s.status === "claimed" || s.status === "initiated"
