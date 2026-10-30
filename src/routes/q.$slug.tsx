@@ -19,12 +19,14 @@ import {
   ShieldCheck,
   Smartphone,
   Sparkles,
+  CreditCard,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import { autoResolve, initiate, upiUri, useStore, type Lang, type AutoResolveResult } from "@/lib/store";
 import { useLang, type Key } from "@/lib/i18n";
 import { soundbox } from "@/lib/audio";
+import { isRazorpayConfigured, launchRazorpayPayment } from "@/lib/razorpay";
 
 export const Route = createFileRoute("/q/$slug")({
   head: () => ({
@@ -38,7 +40,7 @@ export const Route = createFileRoute("/q/$slug")({
       { property: "og:title", content: "Pay your auto driver — AutoMitra" },
       {
         property: "og:description",
-        content: "Scan, pay with UPI, auto-verified without soundbox or family console.",
+        content: "Scan, pay with UPI, auto-verified without soundbox — instant SMS to the driver.",
       },
     ],
   }),
@@ -77,48 +79,25 @@ function Commuter() {
   const [testSimulateFail, setTestSimulateFail] = useState(false);
   const [dispatchResult, setDispatchResult] = useState<AutoResolveResult | null>(null);
 
-  // Auto-detect payment completion when in "verifying" state
-  useEffect(() => {
-    if (view !== "verifying" || !session) return;
-    if (session.status === "confirmed" || session.status === "rejected") return;
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [utrInput, setUtrInput] = useState("");
 
-    let resolved = false;
-
-    const executeResolution = async () => {
-      if (resolved) return;
-      resolved = true;
-      const targetStatus = testSimulateFail ? "rejected" : "confirmed";
-      const res = await autoResolve(session.id, targetStatus, senderName);
-      if (res) {
-        setDispatchResult(res);
-        if (targetStatus === "confirmed") {
-          toast.success("UPI payment detected! SMS sent to driver's phone.");
-        } else {
-          toast.error("Payment failed. Failure SMS dispatched to driver.");
-        }
+  const handleConfirmPayment = async (verifiedPaymentId?: string) => {
+    if (!session) return;
+    setIsProcessing(true);
+    const targetStatus = testSimulateFail ? "rejected" : "confirmed";
+    const payerId = verifiedPaymentId || (utrInput.trim() ? `UTR: ${utrInput.trim()}` : senderName);
+    const res = await autoResolve(session.id, targetStatus, payerId);
+    setIsProcessing(false);
+    if (res) {
+      setDispatchResult(res);
+      if (targetStatus === "confirmed") {
+        toast.success("UPI payment verified! SMS dispatched to driver's phone.");
+      } else {
+        toast.error("Payment failed. Failure SMS dispatched to driver.");
       }
-    };
-
-    // 1. Listen for commuter returning to browser after UPI app payment
-    const onVisibilityOrFocus = () => {
-      if (document.visibilityState === "visible") {
-        setTimeout(executeResolution, 600);
-      }
-    };
-
-    document.addEventListener("visibilitychange", onVisibilityOrFocus);
-    window.addEventListener("focus", onVisibilityOrFocus);
-
-    // 2. Automated timer safeguard (2.2s automated detection)
-    const timer = setTimeout(executeResolution, 2200);
-
-    return () => {
-      resolved = true;
-      clearTimeout(timer);
-      document.removeEventListener("visibilitychange", onVisibilityOrFocus);
-      window.removeEventListener("focus", onVisibilityOrFocus);
-    };
-  }, [view, session, testSimulateFail, senderName]);
+    }
+  };
 
   const handleCopyVpa = () => {
     if (!driver) return;
@@ -194,7 +173,7 @@ function Commuter() {
   }
 
   // Handle Initiating Payment
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const n = Number(fare);
     if (!/^\d+(\.\d{1,2})?$/.test(fare) || n < 1 || n > 5000) {
@@ -207,9 +186,40 @@ function Commuter() {
     if (typeof window !== "undefined") {
       sessionStorage.setItem(`am_session_${slug}`, s.id);
     }
-    setView("verifying");
 
-    // Launch UPI intent
+    // 1. If Razorpay is configured with test or live key, open standard checkout popup
+    if (isRazorpayConfigured()) {
+      setIsProcessing(true);
+      const launched = await launchRazorpayPayment({
+        amount: n,
+        driverName: driver.firstName,
+        vehicleNumber: driver.vehicle,
+        driverPhone: driver.driverPhone,
+        driverVpa: driver.vpa,
+        payerName: cleanSender,
+        token: s.token,
+        onSuccess: async (payment) => {
+          setIsProcessing(false);
+          await handleConfirmPayment(payment.razorpay_payment_id);
+        },
+        onFailure: (error) => {
+          setIsProcessing(false);
+          toast.error(error.description || "Bank payment was declined.");
+        },
+        onDismiss: () => {
+          setIsProcessing(false);
+          toast.info("Payment cancelled. No money was deducted.");
+        },
+      });
+
+      if (launched) {
+        return;
+      }
+      setIsProcessing(false);
+    }
+
+    // 2. Direct UPI fallback (or when Razorpay key is pending)
+    setView("verifying");
     const uri = upiUri(driver, s);
     try {
       window.location.href = uri;
@@ -420,7 +430,7 @@ function Commuter() {
           </span>
 
           <h2 className="mt-4 text-2xl md:text-3xl font-black text-foreground">
-            Verifying UPI Payment...
+            Complete UPI Payment
           </h2>
 
           <p className="fare-readout mt-2 text-3xl md:text-4xl font-black text-amber">
@@ -428,28 +438,79 @@ function Commuter() {
           </p>
 
           <p className="mt-3 text-xs md:text-sm text-muted-foreground max-w-xs leading-relaxed">
-            Please complete the payment in your UPI app (GPay / PhonePe / Paytm). AutoMitra is detecting the bank confirmation automatically...
+            Please approve the payment of ₹{session.amount} in your UPI app (GPay / PhonePe / Paytm). Once done, tap below to confirm.
           </p>
 
-          {/* External UPI Intent Fallback button */}
-          <a
-            id="btn-relaunch-upi"
-            href={upiUri(driver, session)}
-            className="mt-6 inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-xs font-bold text-foreground hover:bg-surface-2 transition-all shadow-sm"
-          >
-            <Smartphone className="size-4 text-amber" />
-            <span>Switch to UPI App</span>
-            <ExternalLink className="size-3 opacity-60 ml-0.5" />
-          </a>
+          {/* Action buttons */}
+          <div className="mt-6 w-full max-w-xs space-y-3">
+            {/* Optional 12-digit UPI UTR / Ref Number */}
+            <div className="text-left space-y-1">
+              <label htmlFor="input-utr" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+                <span>UPI Ref / UTR No.</span>
+                <span className="font-normal lowercase opacity-70">(optional)</span>
+              </label>
+              <input
+                id="input-utr"
+                type="text"
+                maxLength={12}
+                inputMode="numeric"
+                value={utrInput}
+                onChange={(e) => setUtrInput(e.target.value.replace(/\D/g, ""))}
+                placeholder="e.g. 412345678901"
+                className="h-10 w-full rounded-xl border border-border bg-surface px-3 font-mono text-xs font-semibold text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-amber focus:ring-1 focus:ring-amber/20"
+              />
+            </div>
 
-          {/* Cancel button */}
-          <button
-            type="button"
-            onClick={handleReset}
-            className="mt-8 text-xs text-muted-foreground hover:text-err underline transition-colors"
-          >
-            Cancel and change amount
-          </button>
+            <button
+              id="btn-confirm-paid"
+              type="button"
+              disabled={isProcessing}
+              onClick={() => handleConfirmPayment()}
+              className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-amber px-6 text-base font-black text-ink shadow-lg hover:bg-amber-deep active:scale-[0.98] transition-all disabled:opacity-50"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" />
+                  <span>Verifying & Sending SMS...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="size-5" />
+                  <span>I Have Completed Payment</span>
+                </>
+              )}
+            </button>
+
+            <a
+              id="btn-relaunch-upi"
+              href={upiUri(driver, session)}
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 text-xs font-bold text-foreground hover:bg-surface-2 transition-all shadow-sm"
+            >
+              <Smartphone className="size-4 text-amber" />
+              <span>Switch to UPI App</span>
+              <ExternalLink className="size-3 opacity-60 ml-0.5" />
+            </a>
+
+            <button
+              id="btn-cancel-payment"
+              type="button"
+              onClick={handleReset}
+              className="text-xs text-muted-foreground hover:text-err underline transition-colors pt-1 block mx-auto"
+            >
+              Cancel and change fare
+            </button>
+          </div>
+
+          {/* Direct P2P UPI Zero-Commission Card */}
+          <div className="mt-6 rounded-xl border border-dashed border-border bg-surface/40 p-3 text-left text-[11px] text-muted-foreground max-w-xs space-y-1">
+            <div className="flex items-center gap-1.5 font-bold text-foreground">
+              <ShieldCheck className="size-3.5 text-ok" />
+              <span>Direct Peer-to-Peer UPI (Zero Commission)</span>
+            </div>
+            <p>
+              Transfers directly to auto driver&apos;s UPI ID ({driver.vpa}). Confirm above to trigger real-time cellular SMS dispatch to the 2G keypad phone.
+            </p>
+          </div>
         </section>
       )}
     </main>

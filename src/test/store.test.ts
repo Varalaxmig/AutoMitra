@@ -8,6 +8,7 @@ import {
   getDriver,
   addDriver,
   rotateQr,
+  sendOtp,
   resetDemo,
   useStore,
   type Sms,
@@ -99,5 +100,17 @@ describe("AutoMitra Store & Fare Workflow", () => {
     expect(nextSlug).not.toBe(newDriver.slug);
     expect(getDriver(newDriver.slug)).toBeUndefined();
     expect(getDriver(nextSlug)?.active).toBe(true);
+  });
+
+  it("generates and dispatches a 4-digit OTP challenge via sendOtp", async () => {
+    const res = await sendOtp("9082943684");
+    expect(res.code).toMatch(/^\d{4}$/);
+    expect(res.provider).toBeDefined();
+
+    const smsList = JSON.parse(localStorage.getItem("automitra-demo-v1") || "{}").sms || [];
+    const otpSms = smsList.find((m: Sms) => m.kind === "otp");
+    expect(otpSms).toBeDefined();
+    expect(otpSms.to).toBe("9082943684");
+    expect(otpSms.body).toBe(`AutoMitra OTP: ${res.code}`);
   });
 });

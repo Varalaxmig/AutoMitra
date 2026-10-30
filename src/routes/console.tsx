@@ -21,7 +21,7 @@ function ConsoleRedirect() {
       <div className="flex size-16 items-center justify-center rounded-2xl bg-amber/20 text-amber mb-4">
         <CarTaxiFront className="size-8" />
       </div>
-      <h1 className="text-2xl font-black text-foreground">Family Console Retired</h1>
+      <h1 className="text-2xl font-black text-foreground">Console Retired</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         AutoMitra now auto-detects UPI payments and dispatches SMS directly to the driver's phone with zero manual effort.
       </p>

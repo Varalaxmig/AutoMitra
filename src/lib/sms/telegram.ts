@@ -65,7 +65,7 @@ export async function sendTelegramAlert(
       `💰 *Amount:* ₹${options.amount ?? 0}\n` +
       (options.token ? `🏷 *Token:* \`AM${options.token}\`\n` : '') +
       `⚠️ *Action Needed:* Claimed fare waiting for 2 minutes without confirmation!\n` +
-      `_Secondary family proxy alerted._`;
+      `_Secondary contact alerted._`;
   } else if (options.kind === 'otp') {
     text = `🔐 *AutoMitra OTP Challenge:* \`${options.token}\``;
   }

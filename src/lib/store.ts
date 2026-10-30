@@ -484,20 +484,38 @@ export function rotateQr(slug: string): string {
   });
   return addDriver(d).slug;
 }
-export function sendOtp(to: string): string {
+export interface SendOtpResult {
+  code: string;
+  success: boolean;
+  provider: string;
+  error?: string;
+}
+
+export async function sendOtp(to: string): Promise<SendOtpResult> {
   const code = String(Math.floor(1000 + Math.random() * 9000));
   sendTelegramAlert({
     kind: "otp",
     token: code,
     senderName: "Driver Onboarding",
   }).catch(() => {});
-  sendSms({
-    toPhone: to,
-    kind: "otp",
-    senderName: "",
-    amount: 0,
-    otpCode: code,
-  }).catch(() => {});
+
+  let smsResult: { success: boolean; provider: string; error?: string };
+  try {
+    smsResult = await sendSms({
+      toPhone: to,
+      kind: "otp",
+      senderName: "",
+      amount: 0,
+      otpCode: code,
+    });
+  } catch (err: unknown) {
+    smsResult = {
+      success: false,
+      provider: "error",
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
+
   save({
     ...state,
     sms: [
@@ -505,7 +523,13 @@ export function sendOtp(to: string): string {
       ...state.sms,
     ],
   });
-  return code;
+
+  return {
+    code,
+    success: !!smsResult.success,
+    provider: smsResult.provider,
+    error: smsResult.error,
+  };
 }
 export function resetDemo() {
   save(seed);

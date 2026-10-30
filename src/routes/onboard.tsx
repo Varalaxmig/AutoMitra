@@ -37,10 +37,10 @@ export const Route = createFileRoute("/onboard")({
       { title: "Onboard a driver — AutoMitra" },
       {
         name: "description",
-        content: "Register an auto driver, bind the family UPI ID, and print a QR sticker.",
+        content: "Register an auto driver, bind a UPI ID, and print a QR sticker.",
       },
       { property: "og:title", content: "Onboard a driver — AutoMitra" },
-      { property: "og:description", content: "One-time family setup and printable QR sticker." },
+      { property: "og:description", content: "One-time driver setup and printable QR sticker." },
     ],
   }),
   component: Onboard,
@@ -71,6 +71,8 @@ function Onboard() {
   });
   const [otp, setOtp] = useState<string | null>(null);
   const [otpIn, setOtpIn] = useState("");
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isDemoOtp, setIsDemoOtp] = useState(false);
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
@@ -93,7 +95,7 @@ function Onboard() {
           Sign In Required
         </h1>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-md">
-          Driver onboarding and dashboard QR sticker generation is restricted to authorized family proxies and administrators. Please sign in to register an auto, bind 2G keypad phones, and generate stickers.
+          Driver onboarding and dashboard QR sticker generation is restricted to authorized account holders and administrators. Please sign in to register an auto, bind 2G keypad phones, and generate stickers.
         </p>
 
         <div className="mt-8 flex w-full flex-col sm:flex-row items-center justify-center gap-3">
@@ -137,19 +139,41 @@ function Onboard() {
     });
     setOtp("7842");
     setOtpIn("7842");
+    setIsDemoOtp(true);
     setConsent(true);
     setError("");
     toast.info("Demo driver details filled!");
   };
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
     if (!/^[6-9]\d{9}$/.test(f.driverPhone)) {
       setError("Enter a valid 10-digit driver phone before sending OTP.");
       return;
     }
-    const code = sendOtp(f.driverPhone);
-    setOtp(code);
-    toast.success(`OTP ${code} sent to driver phone ${f.driverPhone}`);
+    setIsSendingOtp(true);
+    setError("");
+    try {
+      const res = await sendOtp(f.driverPhone);
+      setOtp(res.code);
+      setOtpIn("");
+      if (res.success && res.provider === "textbee") {
+        setIsDemoOtp(false);
+        toast.success(`OTP sent to +91 ${f.driverPhone} via cellular SMS. Check the driver's phone.`);
+      } else if (res.success) {
+        setIsDemoOtp(false);
+        toast.success(`OTP sent to +91 ${f.driverPhone} via SMS.`);
+      } else {
+        // SMS gateway error or offline
+        setIsDemoOtp(true);
+        toast.error(
+          `SMS Gateway Notice: ${res.error || "SMS failed to dispatch"}. (For local testing, OTP: ${res.code})`
+        );
+      }
+    } catch {
+      toast.error("Network error sending OTP. Please try again.");
+    } finally {
+      setIsSendingOtp(false);
+    }
   };
 
   const submit = (e: React.FormEvent) => {
@@ -165,7 +189,7 @@ function Onboard() {
     }
     if (!/^[\w.-]{2,}@[a-z]{2,}$/i.test(f.vpa)) return setError("UPI ID must look like name@bank.");
     if (vpaCount(f.vpa) >= 3) return setError("This UPI ID already serves 3 drivers maximum.");
-    if (!/^[6-9]\d{9}$/.test(f.proxyPhone)) return setError("Enter a valid 10-digit family phone.");
+    if (!/^[6-9]\d{9}$/.test(f.proxyPhone)) return setError("Enter a valid 10-digit account holder phone.");
     if (!consent) return setError("Both consents are required.");
 
     const d = addDriver({ ...f, vehicle, createdBy: user?.id });
@@ -526,9 +550,17 @@ function Onboard() {
                   id="btn-send-otp"
                   type="button"
                   onClick={handleSendOtp}
-                  className="h-12 shrink-0 rounded-xl border-2 border-amber px-4 font-black text-amber hover:bg-amber hover:text-ink transition-all active:scale-[0.98] text-xs uppercase tracking-wide"
+                  disabled={isSendingOtp}
+                  className="h-12 shrink-0 rounded-xl border-2 border-amber px-4 font-black text-amber hover:bg-amber hover:text-ink transition-all active:scale-[0.98] text-xs uppercase tracking-wide disabled:opacity-50 flex items-center gap-2"
                 >
-                  {t("sendOtpBtn")}
+                  {isSendingOtp ? (
+                    <>
+                      <RefreshCw className="size-3.5 animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : (
+                    t("sendOtpBtn")
+                  )}
                 </button>
               </div>
               <p className="mt-1 text-[11px] text-muted-foreground">
@@ -541,7 +573,9 @@ function Onboard() {
               <div className="rounded-2xl border border-amber/30 bg-amber/5 p-4 space-y-2">
                 <label className="block text-xs font-bold uppercase tracking-wider text-foreground">
                   {t("enterOtp")}{" "}
-                  <span className="text-amber font-mono font-black">(Demo OTP: {otp})</span>
+                  {isDemoOtp && (
+                    <span className="text-amber font-mono font-black">(Demo OTP: {otp})</span>
+                  )}
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -554,14 +588,21 @@ function Onboard() {
                     value={otpIn}
                     onChange={(e) => setOtpIn(e.target.value)}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setOtpIn(otp)}
-                    className="rounded-xl border border-border bg-surface px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
-                  >
-                    Quick-Paste OTP
-                  </button>
+                  {isDemoOtp && (
+                    <button
+                      type="button"
+                      onClick={() => setOtpIn(otp)}
+                      className="rounded-xl border border-border bg-surface px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground"
+                    >
+                      Quick-Paste OTP
+                    </button>
+                  )}
                 </div>
+                {!isDemoOtp && (
+                  <p className="text-[11px] text-muted-foreground">
+                    A 4-digit verification code was dispatched to +91 {f.driverPhone}. Please enter the code received on the driver&apos;s phone.
+                  </p>
+                )}
               </div>
             )}
 
@@ -594,7 +635,7 @@ function Onboard() {
               </div>
             </div>
 
-            {/* 3. Family UPI ID & Family Phone */}
+            {/* 3. UPI ID & Account Holder Phone */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="block mb-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -626,7 +667,7 @@ function Onboard() {
                   onChange={set("proxyPhone")}
                 />
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  For proxy console login & backup alerts.
+                  For account holder login & backup alerts.
                 </p>
               </div>
             </div>

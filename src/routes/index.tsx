@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "AutoMitra — UPI verification for auto drivers" },
       {
         property: "og:description",
-        content: "Zero-screen UPI verification and keypad SMS proxy for Mumbai auto-rickshaws.",
+        content: "Zero-screen UPI verification and keypad SMS confirmation for Mumbai auto-rickshaws.",
       },
     ],
   }),
@@ -75,7 +75,7 @@ function Index() {
           </span>
         </div>
         <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest px-2.5 sm:px-3 py-1 rounded-full border border-amber/40 bg-surface text-amber">
-          Zero-Screen UPI Proxy
+          Zero-Screen UPI Verification
         </span>
       </header>
 
@@ -153,7 +153,7 @@ function Card({
   icon: typeof QrCode;
   title: string;
   body: string;
-  to: "/q/$slug" | "/console" | "/onboard";
+  to: "/q/$slug" | "/onboard";
   params?: { slug: string };
 }) {
   return (

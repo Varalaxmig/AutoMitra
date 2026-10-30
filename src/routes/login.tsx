@@ -246,7 +246,7 @@ function LoginPage() {
             className="flex flex-col items-start rounded-xl border border-border bg-surface p-2.5 text-left text-xs hover:border-amber/60 hover:bg-amber/5 transition-all"
           >
             <span className="font-bold text-foreground">Sneha Test</span>
-            <span className="text-[10px] text-muted-foreground font-mono">proxy1 (EN)</span>
+            <span className="text-[10px] text-muted-foreground font-mono">account1 (EN)</span>
           </button>
 
           <button
@@ -256,7 +256,7 @@ function LoginPage() {
             className="flex flex-col items-start rounded-xl border border-border bg-surface p-2.5 text-left text-xs hover:border-amber/60 hover:bg-amber/5 transition-all"
           >
             <span className="font-bold text-foreground">Meera Test</span>
-            <span className="text-[10px] text-muted-foreground font-mono">proxy2 (MR मराठी)</span>
+            <span className="text-[10px] text-muted-foreground font-mono">account2 (MR मराठी)</span>
           </button>
 
           <button

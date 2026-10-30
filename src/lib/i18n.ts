@@ -30,7 +30,7 @@ const dict = {
   // Navigation Tabs
   navHome: { en: "Home", hi: "होम", mr: "मुख्यपृष्ठ" },
   navCommuter: { en: "Commuter", hi: "यात्री", mr: "प्रवासी" },
-  navConsole: { en: "Family Console", hi: "परिवार कंसोल", mr: "कुटुंब कन्सोल" },
+  navConsole: { en: "Console", hi: "कंसोल", mr: "कन्सोल" },
   navOnboard: { en: "Onboard Driver", hi: "चालक जोड़ें", mr: "चालक जोडा" },
 
   // Home Page
@@ -40,9 +40,9 @@ const dict = {
     mr: "कोणतेही स्क्रीनशॉट नाही. फक्त पुरावा.",
   },
   heroDesc: {
-    en: "UPI verification for Mumbai auto drivers carrying only a 2G keypad phone. The family member who holds the UPI account confirms each fare in real time, and the driver instantly receives an SMS.",
-    hi: "2G कीपैड फोन वाले मुंबई ऑटो चालकों के लिए UPI सत्यापन। परिवार का सदस्य बैंक क्रेडिट देखकर तुरंत पुष्टि करता है और चालक को SMS मिलता है।",
-    mr: "2G कीपॅड फोन वापरणाऱ्या मुंबईतील ऑटो चालकांसाठी UPI पडताळणी. कुटुंब रिअल क्रेडिट पाहून पुष्टी करते आणि चालकाला लगेच SMS मिळतो.",
+    en: "UPI verification for Mumbai auto drivers carrying only a 2G keypad phone. Commuters pay via UPI, a unique token confirms each fare automatically, and the driver instantly receives an SMS.",
+    hi: "2G कीपैड फोन वाले मुंबई ऑटो चालकों के लिए UPI सत्यापन। यात्री UPI से भुगतान करता है, टोकन से किराया अपने आप सत्यापित होता है और चालक को तुरंत SMS मिलता है।",
+    mr: "2G कीपॅड फोन वापरणाऱ्या मुंबईतील ऑटो चालकांसाठी UPI पडताळणी. प्रवासी UPI ने पैसे भरतो, टोकनद्वारे भाडे आपोआप पडताळले जाते आणि चालकाला लगेच SMS मिळतो.",
   },
   step1Title: {
     en: "Scan & enter fare",
@@ -70,16 +70,16 @@ const dict = {
     hi: "स्क्रीन पर बड़े 4 अंक; चालक को वही टोकन SMS से मिलता है।",
     mr: "स्क्रीनवर मोठे 4 अंक; चालकाला तोच टोकन SMS द्वारे मिळतो.",
   },
-  step4Title: { en: "Family confirms", hi: "परिवार पुष्टि करता है", mr: "कुटुंब पुष्टी करते" },
+  step4Title: { en: "Auto-verified", hi: "स्वतः पुष्टि", mr: "आपोआप पुष्टी" },
   step4Desc: {
-    en: "Proxy verifies bank credit and taps Confirm. Driver gets CONFIRMED SMS.",
-    hi: "परिवार बैंक क्रेडिट देखकर Confirm दबाता है। चालक को CONFIRMED SMS मिलता है।",
-    mr: "कुटुंब बँक क्रेडिट पाहून Confirm दाबते. चालकाला CONFIRMED SMS मिळतो.",
+    en: "Token match confirms the fare. Driver gets CONFIRMED SMS on keypad phone.",
+    hi: "टोकन मिलान से किराया पुष्टि होता है। चालक को कीपैड फोन पर CONFIRMED SMS मिलता है।",
+    mr: "टोकन जुळल्यावर भाडे पुष्टी होते. चालकाला कीपॅड फोनवर CONFIRMED SMS मिळतो.",
   },
   demoNotice: {
-    en: "Demo mode: open commuter and family console in two tabs to see real-time sync.",
-    hi: "डेमो मोड: वास्तविक समय सिंक देखने के लिए दो टैब में यात्री और कंसोल खोलें।",
-    mr: "डेमो मोड: रिअल-टाइम सिंक पाहण्यासाठी दोन टॅबमध्ये प्रवासी आणि कन्सोल उघडा.",
+    en: "Demo mode: open commuter and driver pages in two tabs to see real-time sync.",
+    hi: "डेमो मोड: वास्तविक समय सिंक देखने के लिए दो टैब में यात्री और चालक पृष्ठ खोलें।",
+    mr: "डेमो मोड: रिअल-टाइम सिंक पाहण्यासाठी दोन टॅबमध्ये प्रवासी आणि चालक पृष्ठ उघडा.",
   },
   resetDemoBtn: { en: "Reset demo", hi: "डेमो रीसेट करें", mr: "डेमो रीसेट करा" },
 
@@ -97,9 +97,9 @@ const dict = {
   },
   pay: { en: "Pay", hi: "भुगतान करें", mr: "पैसे भरा" },
   footer: {
-    en: "Pays directly to the driver's family account",
-    hi: "सीधे ड्राइवर के परिवार के खाते में",
-    mr: "थेट चालकाच्या कुटुंबाच्या खात्यात",
+    en: "Pays directly to the driver's UPI account",
+    hi: "सीधे ड्राइवर के UPI खाते में",
+    mr: "थेट चालकाच्या UPI खात्यात",
   },
   ready: { en: "Ready", hi: "तैयार", mr: "तयार" },
   awaiting: { en: "Awaiting", hi: "प्रतीक्षा", mr: "प्रतीक्षा" },
@@ -123,9 +123,9 @@ const dict = {
   token: { en: "TOKEN", hi: "टोकन", mr: "टोकन" },
   showDriver: { en: "Show this to the driver", hi: "यह ड्राइवर को दिखाएं", mr: "हे चालकाला दाखवा" },
   waitingConfirm: {
-    en: "Waiting for family to confirm credit",
-    hi: "परिवार की पुष्टि का इंतज़ार",
-    mr: "कुटुंबाच्या पुष्टीची वाट",
+    en: "Waiting for payment confirmation",
+    hi: "भुगतान पुष्टि का इंतज़ार",
+    mr: "पेमेंट पुष्टीची वाट",
   },
   confirmed: { en: "CONFIRMED", hi: "पुष्टि हुई", mr: "पुष्टी झाली" },
   notPaid: { en: "NOT PAID", hi: "भुगतान नहीं हुआ", mr: "पैसे मिळाले नाहीत" },
@@ -142,11 +142,11 @@ const dict = {
     mr: "हा QR आता सक्रिय नाही",
   },
 
-  // Family Console
+  // Verification Console
   proxyConsole: {
-    en: "Family Proxy Console",
-    hi: "परिवार प्रॉक्सी कंसोल",
-    mr: "कुटुंब प्रॉक्सी कन्सोल",
+    en: "Verification Console",
+    hi: "सत्यापन कंसोल",
+    mr: "पडताळणी कन्सोल",
   },
   proxySubtitle: {
     en: "Check your bank credit for note AM####, then verify.",
@@ -185,9 +185,9 @@ const dict = {
   // Onboard Page
   onboardTitle: { en: "Onboard a driver", hi: "ऑटो चालक जोड़ें", mr: "ऑटो चालक जोडा" },
   onboardSubtitle: {
-    en: "Bind a driver's 2G phone to your family UPI ID and print their dashboard QR sticker.",
-    hi: "चालक के 2G फोन को अपने परिवार UPI ID से जोड़ें और डैशबोर्ड QR स्टिकर प्रिंट करें।",
-    mr: "चालकाचा 2G फोन कुटुंबाच्या UPI ID शी जोडा आणि डॅशबोर्ड QR स्टिकर प्रिंट करा.",
+    en: "Bind a driver's 2G phone to a UPI ID and print their dashboard QR sticker.",
+    hi: "चालक के 2G फोन को UPI ID से जोड़ें और डैशबोर्ड QR स्टिकर प्रिंट करें।",
+    mr: "चालकाचा 2G फोन UPI ID शी जोडा आणि डॅशबोर्ड QR स्टिकर प्रिंट करा.",
   },
   driverFirstName: { en: "Driver first name", hi: "चालक का नाम", mr: "चालकाचे नाव" },
   vehicle: { en: "Vehicle", hi: "गाड़ी", mr: "गाडी" },
@@ -196,7 +196,7 @@ const dict = {
     hi: "गाड़ी नंबर (जैसे MH02AB1234)",
     mr: "गाडी क्रमांक (उदा. MH02AB1234)",
   },
-  familyPhone: { en: "Family (proxy) phone", hi: "परिवार का फोन नंबर", mr: "कुटुंबाचा फोन नंबर" },
+  familyPhone: { en: "Account holder phone", hi: "खाताधारक का फोन नंबर", mr: "खातेधारकाचा फोन नंबर" },
   driverKeypadPhone: {
     en: "Driver 2G keypad phone",
     hi: "चालक का कीपैड फोन नंबर",
@@ -209,9 +209,9 @@ const dict = {
     mr: "चालकाला मिळालेला OTP लिहा",
   },
   familyUpiId: {
-    en: "Family UPI ID (for receiving fares)",
-    hi: "परिवार UPI ID (पैसे प्राप्त करने के लिए)",
-    mr: "कुटुंब UPI ID (पैसे मिळवण्यासाठी)",
+    en: "UPI ID (for receiving fares)",
+    hi: "UPI ID (पैसे प्राप्त करने के लिए)",
+    mr: "UPI ID (पैसे मिळवण्यासाठी)",
   },
   driverSmsLang: { en: "Driver SMS language", hi: "चालक SMS भाषा", mr: "चालक SMS भाषा" },
   consentText: {

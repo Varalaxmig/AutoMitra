@@ -13,6 +13,9 @@ export function buildSmsBody(payload: SmsPayload): string {
   const { kind, senderName, senderUpi, amount, otpCode, lang = 'en' } = payload;
 
   if (kind === 'otp') {
+    if (otpCode && (otpCode.startsWith('AutoMitra') || otpCode.length > 10)) {
+      return otpCode;
+    }
     return `AutoMitra OTP: ${otpCode || '0000'}`;
   }
 

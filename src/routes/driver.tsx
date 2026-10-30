@@ -161,7 +161,7 @@ function DriverDashboard() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-black text-foreground">Recent Ride Payments</h2>
           <span className="text-xs text-muted-foreground">
-            Synced live with family proxy confirmations
+            Synced live with payment confirmations
           </span>
         </div>
 

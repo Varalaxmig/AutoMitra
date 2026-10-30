@@ -309,7 +309,7 @@ export function Forbidden403({
   const navigate = useNavigate();
 
   const roleLabel = (r: UserRole | null) => {
-    if (r === "proxy") return "Family Proxy";
+    if (r === "proxy") return "Account Holder";
     if (r === "driver") return "Auto Driver";
     if (r === "commuter") return "Commuter";
     return "User";
